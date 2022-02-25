@@ -43,7 +43,7 @@
     ]
   },
   "devDependencies": {
-    "antd": "^4.18.2",
+    "antd": "^4.18.7",
     "cesium": "^1.89.0",
     "resium": "^1.14.3"
   }

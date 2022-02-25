@@ -1,9 +1,10 @@
 // import ImageryProvider from "cesium/Source/Scene/ImageryProvider";
+import Cartesian3 from "cesium/Source/Core/Cartesian3";
 import MapboxStyleImageryProvider from "cesium/Source/Scene/MapboxStyleImageryProvider";
 import OpenStreetMapImageryProvider from "cesium/Source/Scene/OpenStreetMapImageryProvider";
-import UrlTemplateImageryProvider from "cesium/Source/Scene/UrlTemplateImageryProvider";
+// import UrlTemplateImageryProvider from "cesium/Source/Scene/UrlTemplateImageryProvider";
 import React from "react";
-import { Viewer, ImageryLayer} from "resium";
+import { Viewer, ImageryLayer, CameraFlyTo} from "resium";
 
 
 // function MapViewer() {
@@ -33,11 +34,12 @@ const osmStyle = new MapboxStyleImageryProvider({
 //     minimumLevel: 4,
 //     maximumLevel: 18
 // })
-
+const cameraDestination =  Cartesian3.fromDegrees(114.3, 30.5, 7000);
 const MapViewer : React.FC<{}> = () => {
     return (
-    <Viewer imageryProvider = {osm}>
+    <Viewer imageryProvider = {osm} style={{height: window.innerHeight}}>
         <ImageryLayer imageryProvider={osmStyle}></ImageryLayer>
+        <CameraFlyTo destination={cameraDestination}></CameraFlyTo>
     </Viewer>
     )
 }

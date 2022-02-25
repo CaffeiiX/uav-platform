@@ -3,11 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 // import App from './App';
 import reportWebVitals from './reportWebVitals';
-import MapViewer from './components/mapViewer';
+// import MapViewer from './components/mapViewer';
+import MainViewer from './components/mainView';
 // import {Viewer} from "resium";
 ReactDOM.render(
   <React.StrictMode>
-    <MapViewer/>
+    <MainViewer />
   </React.StrictMode>,
   document.getElementById('root')
 ); 

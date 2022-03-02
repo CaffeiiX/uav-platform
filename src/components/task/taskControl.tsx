@@ -2,7 +2,7 @@ import { Button, Radio } from "antd";
 import { useState } from "react";
 import 'antd/dist/antd.css';
 import './taskControl.css';
-const TaskControl : React.FC<{}> = () => {
+const TaskControl : React.FC<{onCreateTaskShowModal: () => void }> = ({onCreateTaskShowModal}) => {
     const [value, setValue] = useState(0);
     return (
         <>
@@ -13,7 +13,7 @@ const TaskControl : React.FC<{}> = () => {
             <Radio className="radio" value={0} key={'static'}>静态任务</Radio>
             <Radio className="radio" value={1} key={'dynamic'}>动态任务</Radio>
         </Radio.Group>
-        <Button className="task-button" disabled={value === 0 ? false: true}>
+        <Button className="task-button" disabled={value === 0 ? false: true} onClick={onCreateTaskShowModal}>
             创建任务
         </Button>
         <Button className="task-button" disabled={true}>

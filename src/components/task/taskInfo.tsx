@@ -20,7 +20,7 @@ const TaskInfo : React.FC<{}> = () => {
         </div>
         <Select defaultValue={uavList[0]}>
             {uavList.map((item) => {
-                return <Option value = {item}>{item}</Option>
+                return <Option value = {item} key={item}>{item}</Option>
             })}
         </Select>
         </div>

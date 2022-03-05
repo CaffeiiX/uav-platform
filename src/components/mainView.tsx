@@ -16,7 +16,7 @@ const MapViewerMemo = memo(MapViewer);
 const MainView: React.FC<{}> = () => {
   // const [collapsed, setCollapsed] = useState(false);
   const [isCreateTaskModalShow, setCreateTaskModalShow] = useState<boolean>(false);
-  
+
   return (
     <>
       <Layout style={{ minHeight: "100vh" }}>

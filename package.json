@@ -11,6 +11,7 @@
     "@types/node": "^16.11.13",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
+    "axios": "^0.26.0",
     "craco-cesium": "^1.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

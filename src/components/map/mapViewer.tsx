@@ -1,11 +1,13 @@
 // import ImageryProvider from "cesium/Source/Scene/ImageryProvider";
-import Cartesian3 from "cesium/Source/Core/Cartesian3";
 import MapboxStyleImageryProvider from "cesium/Source/Scene/MapboxStyleImageryProvider";
 import OpenStreetMapImageryProvider from "cesium/Source/Scene/OpenStreetMapImageryProvider";
 // import UrlTemplateImageryProvider from "cesium/Source/Scene/UrlTemplateImageryProvider";
-import React from "react";
-import { Viewer, ImageryLayer, CameraFlyTo} from "resium";
-
+import React, { useEffect, useRef, useState} from "react";
+import { Viewer, ImageryLayer, CesiumComponentRef} from "resium";
+// import { Entity as REntity }  from "resium";
+import { Viewer as CesiumViewer} from "cesium";
+// import ViewerTestComponent from "./viewer";
+import CesiumViewMouseEvent from "./cesiumViewMouseEvent";
 
 // function MapViewer() {
 //     return (
@@ -33,13 +35,41 @@ const osmStyle = new MapboxStyleImageryProvider({
 //     url: 'https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=8&ltype=11',
 //     minimumLevel: 4,
 //     maximumLevel: 18
-// })
-const cameraDestination =  Cartesian3.fromDegrees(114.3, 30.5, 7000);
+// });
+
+
+
 const MapViewer : React.FC<{}> = () => {
+    const ref = useRef<CesiumComponentRef<CesiumViewer>>(null);
+    const [isDrawPolygon, setIsDrawPolygon] = useState<boolean>(true);
+
+    useEffect(() => {
+        console.log(isDrawPolygon);
+        if(ref.current?.cesiumElement){
+            const mouseEvent = CesiumViewMouseEvent(ref.current?.cesiumElement, setIsDrawPolygon);
+            mouseEvent();
+        }
+    }, [isDrawPolygon])
+    
     return (
-    <Viewer imageryProvider = {osm} style={{height: window.innerHeight}}>
+    <Viewer imageryProvider = {osm} style={{height: window.innerHeight}} 
+            onClick={(e, Entity) => {}} 
+            ref={ref} 
+            onMouseDown={(e) => {}} 
+            onRightClick={(e) => {}} infoBox={false}>
         <ImageryLayer imageryProvider={osmStyle}></ImageryLayer>
-        <CameraFlyTo destination={cameraDestination}></CameraFlyTo>
+        {/* <CameraFlyTo destination={cameraDestination}></CameraFlyTo> */}
+        {/* {pointsCols.map((position) => {
+            const ray=ref.current?.cesiumElement?.camera.getPickRay(position);
+            if(ray){
+                return (
+                    <REntity position={ref.current?.cesiumElement?.scene.globe.pick(ray, ref.current.cesiumElement.scene)} 
+                            point={{pixelSize: 10, color: Color.WHITE, heightReference: HeightReference.CLAMP_TO_GROUND}}
+                            >
+                    </REntity>
+                    )
+            }
+        })} */}
     </Viewer>
     )
 }

@@ -7,6 +7,7 @@ import CreateTaskModal from "./modal/createTaskModal";
 import Control from "./control/control";
 import { IsCreateTaskContext } from "../context/taskContext";
 import Task from "./task/task";
+import { useCesium } from "resium";
 
 
 const { Content, Sider } = Layout;
@@ -16,7 +17,6 @@ const MapViewerMemo = memo(MapViewer);
 const MainView: React.FC<{}> = () => {
   // const [collapsed, setCollapsed] = useState(false);
   const [isCreateTaskModalShow, setCreateTaskModalShow] = useState<boolean>(false);
-
   return (
     <>
       <Layout style={{ minHeight: "100vh" }}>

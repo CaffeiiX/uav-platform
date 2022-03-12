@@ -7,7 +7,6 @@ const {TabPane} = Tabs;
 const getAllkeys = (plugins: Plugins) => {
     const keys : string[] = [];
     for(let key of Object.keys(plugins)) {
-        console.log(plugins[key]);
         plugins[key].map((item) => {
             let tempKey = Object.keys(item)[0];
             if(item[tempKey][0] && item[tempKey][1]) {

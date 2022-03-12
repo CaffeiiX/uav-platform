@@ -2,12 +2,13 @@
 import MapboxStyleImageryProvider from "cesium/Source/Scene/MapboxStyleImageryProvider";
 import OpenStreetMapImageryProvider from "cesium/Source/Scene/OpenStreetMapImageryProvider";
 // import UrlTemplateImageryProvider from "cesium/Source/Scene/UrlTemplateImageryProvider";
-import React, { useEffect, useRef, useState} from "react";
-import { Viewer, ImageryLayer, CesiumComponentRef} from "resium";
+import React, { useContext, useEffect, useRef} from "react";
+import { Viewer, ImageryLayer, CesiumComponentRef, CameraFlyTo} from "resium";
 // import { Entity as REntity }  from "resium";
-import { Viewer as CesiumViewer} from "cesium";
+import { Cartesian3, ScreenSpaceEventHandler, ScreenSpaceEventType, Viewer as CesiumViewer} from "cesium";
 // import ViewerTestComponent from "./viewer";
 import CesiumViewMouseEvent from "./cesiumViewMouseEvent";
+import { IsCreateTaskContext } from "../../context/taskContext";
 
 // function MapViewer() {
 //     return (
@@ -16,6 +17,14 @@ import CesiumViewMouseEvent from "./cesiumViewMouseEvent";
 //     )
 // }
 
+type drawPolygonState = {
+    isDrawPolygon: boolean;
+    setIsDrwaPolygon: (c: boolean) => void;
+  };
+type drawPolygonRegion = {
+    polygonRegion: Cartesian3 [];
+    setPolygonRegion: (c: Cartesian3[]) => void;
+};
 const osm = new OpenStreetMapImageryProvider({
     url: "https://a.tile.openstreetmap.org/",
 })
@@ -26,6 +35,8 @@ const osmStyle = new MapboxStyleImageryProvider({
     accessToken: 'pk.eyJ1IjoiY2FpdzA0MjEiLCJhIjoiY2tyNTkycTdrMzA4MzJ1cWg5ajhmczhmOSJ9.BB9GKYcs2TrLbM_koPoIbQ'
 })
 
+const CamerFlyToMemo = React.memo(CameraFlyTo);
+const cameraDestination = Cartesian3.fromDegrees(114.3, 30.5, 5000);
 // const amap = new UrlTemplateImageryProvider({
 //     url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
 //     minimumLevel: 4,
@@ -37,19 +48,29 @@ const osmStyle = new MapboxStyleImageryProvider({
 //     maximumLevel: 18
 // });
 
-
-
-const MapViewer : React.FC<{}> = () => {
+const MapViewer : React.FC<{isDrawPolygon: drawPolygonState
+                            drawPolygonRegion: drawPolygonRegion}> = ({isDrawPolygon, drawPolygonRegion}) => {
+    const createTaskContext = useContext(IsCreateTaskContext);
     const ref = useRef<CesiumComponentRef<CesiumViewer>>(null);
-    const [isDrawPolygon, setIsDrawPolygon] = useState<boolean>(true);
+    let mouseHandler= useRef<ScreenSpaceEventHandler| undefined>(undefined);
 
+    // const [isDrawPolygon, setIsDrawPolygon] = useState<boolean>(true);
     useEffect(() => {
-        console.log(isDrawPolygon);
-        if(ref.current?.cesiumElement){
-            const mouseEvent = CesiumViewMouseEvent(ref.current?.cesiumElement, setIsDrawPolygon);
+        if(ref.current?.cesiumElement && isDrawPolygon.isDrawPolygon){
+            const mouseEvent = CesiumViewMouseEvent(ref.current?.cesiumElement, 
+                                                    isDrawPolygon.setIsDrwaPolygon, 
+                                                    createTaskContext.setIsCreateTaskModal,
+                                                    drawPolygonRegion.setPolygonRegion,
+                                                    mouseHandler);
             mouseEvent();
+        } else{
+            if(mouseHandler.current) {
+                mouseHandler.current.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+                mouseHandler.current.removeInputAction(ScreenSpaceEventType.RIGHT_CLICK);
+                mouseHandler.current.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
+            }
         }
-    }, [isDrawPolygon])
+    }, [isDrawPolygon.isDrawPolygon])
     
     return (
     <Viewer imageryProvider = {osm} style={{height: window.innerHeight}} 
@@ -58,7 +79,7 @@ const MapViewer : React.FC<{}> = () => {
             onMouseDown={(e) => {}} 
             onRightClick={(e) => {}} infoBox={false}>
         <ImageryLayer imageryProvider={osmStyle}></ImageryLayer>
-        {/* <CameraFlyTo destination={cameraDestination}></CameraFlyTo> */}
+        <CamerFlyToMemo destination={cameraDestination}></CamerFlyToMemo>
         {/* {pointsCols.map((position) => {
             const ray=ref.current?.cesiumElement?.camera.getPickRay(position);
             if(ray){

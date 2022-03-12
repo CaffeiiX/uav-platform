@@ -38,8 +38,18 @@ const getTaskUavInfo = async (taskId: string) => {
         }
     });
     const uavList: UavInfoType[] = response.data.data;
-    console.log(taskId);
-    console.log(uavList);
     return uavList;
 }
-export {getTaskInfo, getTaskUavInfo};
+
+
+const getTaskUavList =async () => {
+    const response = await axios.get(`${baseUrl}/queryDroneStatus`);
+    const uavList : string[] = response.data.data;
+    return uavList;
+}
+
+const postCreateTask = async () => {
+    
+}
+
+export {getTaskInfo, getTaskUavInfo, getTaskUavList};

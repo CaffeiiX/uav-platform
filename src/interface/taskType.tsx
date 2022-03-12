@@ -35,4 +35,12 @@ type UavInfoType = {
     'status': string
 }
 
-export type {TaskInfoType, TaskInfoApiType, UavInfoType}
+type CreateTaskType = {
+    droneIds: string[],
+    task_bounary: string,
+    task_name: string,
+    task_status: 0|1|2|3,
+    task_type: 0|1
+}
+
+export type {TaskInfoType, TaskInfoApiType, UavInfoType, CreateTaskType}

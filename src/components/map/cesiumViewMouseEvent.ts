@@ -32,16 +32,20 @@ const createPolygonEntity = (viewer: CesiumViewer ,positionData: any) => {
     return polygon;
 }
 
-function CesiumViewMouseEvent(viewer: CesiumViewer, setIsDrawPolygon: any) {
+function CesiumViewMouseEvent(viewer: CesiumViewer, 
+                              setIsDrawPolygon: any, 
+                              setIsCreateModal: any,
+                              setPolygonRegion: (c: Cartesian3[]) => void, 
+                              handler: any) {
     let activePolygonPoints : Cartesian3 [] = [];
     let activePolygon : any = undefined;
     let floatingPoint : any = undefined;
-    const handler = new ScreenSpaceEventHandler(viewer.canvas);
     viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(
         ScreenSpaceEventType.LEFT_DOUBLE_CLICK
     );
     return function () {
-        handler.setInputAction((event: CesiumMovementEvent) => {
+        handler.current = new ScreenSpaceEventHandler(viewer.canvas);
+        handler.current.setInputAction((event: CesiumMovementEvent) => {
             if(event.position){
                 const ray=viewer.camera.getPickRay(event.position);
                 const earthPosition = viewer.scene.globe.pick(ray, viewer.scene);
@@ -61,7 +65,7 @@ function CesiumViewMouseEvent(viewer: CesiumViewer, setIsDrawPolygon: any) {
                 }
             }
         }, ScreenSpaceEventType.LEFT_CLICK);
-        handler.setInputAction((event : CesiumMovementEvent) => {
+        handler.current.setInputAction((event : CesiumMovementEvent) => {
             if(event.endPosition){
                 if(defined(floatingPoint)){
                     const ray=viewer.camera.getPickRay(event.endPosition);
@@ -76,15 +80,18 @@ function CesiumViewMouseEvent(viewer: CesiumViewer, setIsDrawPolygon: any) {
                 }
             }
         }, ScreenSpaceEventType.MOUSE_MOVE);
-        handler.setInputAction((event : CesiumMovementEvent) => {
+        handler.current.setInputAction((event : CesiumMovementEvent) => {
             activePolygonPoints.pop();
             createPolygonEntity(viewer, activePolygonPoints);
             viewer.entities.remove(floatingPoint);
             viewer.entities.remove(activePolygon);
+            console.log(activePolygonPoints);
+            setPolygonRegion(activePolygonPoints);
             floatingPoint = undefined;
             activePolygon = undefined;
             activePolygonPoints = [];
             setIsDrawPolygon(false);
+            setIsCreateModal(true);
         }, ScreenSpaceEventType.RIGHT_CLICK);
     }
 }

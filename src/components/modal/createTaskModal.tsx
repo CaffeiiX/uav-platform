@@ -1,7 +1,7 @@
 import { Button, Input, Modal, Select } from "antd";
 import { Cartesian3 } from "cesium";
 import { useContext, useEffect, useState} from "react";
-import { getTaskUavList } from "../../api/taskAPI";
+import { getTaskUavList, postCreateTask } from "../../api/taskAPI";
 import { IsCreateTaskContext } from "../../context/taskContext";
 
 
@@ -15,12 +15,21 @@ const CreateTaskModal: React.FC<{onDrawClick: any
     const [uavList, setUavList] = useState<string[]>(['1','2','3']);
     const [selectUavList, setSetlectUavList] = useState<string[]>([]);
 
-    const handleOnOk = () => {
+    const handleOnOk = async () => {
         if(taskName === '' || selectUavList.length === 0 || polygonRegion.length === 0){
             alert('请输入数据');
             return;
         }
         createTaskContext.setIsCreateTaskModal(false);
+        const status = await postCreateTask({
+            task_name: taskName,
+            droneIds: selectUavList,
+            task_bounary: polygonRegion,
+            task_status: '1',
+            task_type: '1' 
+        })
+        //更新任务的状态
+        if(status === 'success') console.log('post create task success');
         console.log([uavList, taskName, polygonRegion]);
     };
 

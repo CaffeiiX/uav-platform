@@ -32,7 +32,7 @@ const createPolygonEntity = (viewer: CesiumViewer ,positionData: any) => {
     return polygon;
 }
 
-function CesiumViewMouseEvent(viewer: CesiumViewer, 
+function CesiumViewMouseEvent(viewer: CesiumViewer,
                               setIsDrawPolygon: any, 
                               setIsCreateModal: any,
                               setPolygonRegion: (c: Cartesian3[]) => void, 

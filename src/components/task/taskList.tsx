@@ -9,7 +9,6 @@ const TaskList : React.FC<{select: (task: TaskInfoType) => void, selectedTask: T
     const [pageNum, setPageNum] = useState(1);
     const [taskList, setTaskList] = useState<TaskInfoType[]>([]);
     // const [selectTask, setSelectTask] = useState<TaskInfoType>();
-
     useEffect(() => {
         const fetchTaskData = async () => { 
             const taskData = await getTaskInfo(pageNum, 3, 1);

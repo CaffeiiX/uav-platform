@@ -4,7 +4,7 @@ type TaskInfoType = {
     'date': string,
     'name': string,
     'status': string,
-    'boundary': number[]
+    'boundary': number[][]
 }
 
 type TaskDatetime = {
@@ -43,4 +43,21 @@ type CreateTaskType = {
     task_type: 0|1
 }
 
-export type {TaskInfoType, TaskInfoApiType, UavInfoType, CreateTaskType}
+type UavWsDataType = {
+    "GPSPosition_altitude": number,
+    "GPSPosition_latitude": number,
+    "GPSPosition_longitude": number,
+    "PedUnion_x1": number,
+    "PedUnion_x2": number,
+    "PedUnion_y1": number,
+    "PedUnion_y2": number,
+    "UAV_id": string,
+    "UAV_time": number,
+    "vx": number,
+    "vy": number,
+    "vz": number,
+    "PedUnionNums": string,
+    "PedUnionRes": string,
+    "leftBattery": string
+}
+export type {TaskInfoType, TaskInfoApiType, UavInfoType, CreateTaskType, UavWsDataType}

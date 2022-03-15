@@ -2,20 +2,15 @@
 import MapboxStyleImageryProvider from "cesium/Source/Scene/MapboxStyleImageryProvider";
 import OpenStreetMapImageryProvider from "cesium/Source/Scene/OpenStreetMapImageryProvider";
 // import UrlTemplateImageryProvider from "cesium/Source/Scene/UrlTemplateImageryProvider";
-import React, { useContext, useEffect, useRef} from "react";
-import { Viewer, ImageryLayer, CesiumComponentRef, CameraFlyTo} from "resium";
+import React, { useContext, useEffect, useRef, useState} from "react";
+import { Viewer, ImageryLayer, CesiumComponentRef, CameraFlyTo, Entity as REntity, PolygonGraphics, PointGraphics} from "resium";
 // import { Entity as REntity }  from "resium";
-import { Cartesian3, ScreenSpaceEventHandler, ScreenSpaceEventType, Viewer as CesiumViewer} from "cesium";
+import { Cartesian3, Color, ColorMaterialProperty, ScreenSpaceEventHandler, ScreenSpaceEventType, Viewer as CesiumViewer} from "cesium";
 // import ViewerTestComponent from "./viewer";
 import CesiumViewMouseEvent from "./cesiumViewMouseEvent";
-import { IsCreateTaskContext } from "../../context/taskContext";
+import { IsCreateTaskContext, SelectTaskContext } from "../../context/taskContext";
+import { polygonCenter } from "../../utils/utils";
 
-// function MapViewer() {
-//     return (
-//         <Viewer>
-//         </Viewer>
-//     )
-// }
 
 type drawPolygonState = {
     isDrawPolygon: boolean;
@@ -36,7 +31,6 @@ const osmStyle = new MapboxStyleImageryProvider({
 })
 
 const CamerFlyToMemo = React.memo(CameraFlyTo);
-const cameraDestination = Cartesian3.fromDegrees(114.3, 30.5, 5000);
 // const amap = new UrlTemplateImageryProvider({
 //     url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
 //     minimumLevel: 4,
@@ -53,8 +47,10 @@ const MapViewer : React.FC<{isDrawPolygon: drawPolygonState
     const createTaskContext = useContext(IsCreateTaskContext);
     const ref = useRef<CesiumComponentRef<CesiumViewer>>(null);
     let mouseHandler= useRef<ScreenSpaceEventHandler| undefined>(undefined);
-
+    const [cameraDestination, setCameraDestination] = useState<Cartesian3>(Cartesian3.fromDegrees(114.3, 30.5, 5000));
+    const selectTaskContext = useContext(SelectTaskContext);
     // const [isDrawPolygon, setIsDrawPolygon] = useState<boolean>(true);
+    //鼠标绘制事件
     useEffect(() => {
         if(ref.current?.cesiumElement && isDrawPolygon.isDrawPolygon){
             const mouseEvent = CesiumViewMouseEvent(ref.current?.cesiumElement, 
@@ -71,7 +67,10 @@ const MapViewer : React.FC<{isDrawPolygon: drawPolygonState
             }
         }
     }, [isDrawPolygon.isDrawPolygon])
-    
+    useEffect(() => {
+        const centerPoint = polygonCenter(selectTaskContext.selectTask.boundary);
+        setCameraDestination(centerPoint);
+    },[selectTaskContext.selectTask])
     return (
     <Viewer imageryProvider = {osm} style={{height: window.innerHeight}} 
             onClick={(e, Entity) => {}} 
@@ -80,17 +79,29 @@ const MapViewer : React.FC<{isDrawPolygon: drawPolygonState
             onRightClick={(e) => {}} infoBox={false}>
         <ImageryLayer imageryProvider={osmStyle}></ImageryLayer>
         <CamerFlyToMemo destination={cameraDestination}></CamerFlyToMemo>
-        {/* {pointsCols.map((position) => {
-            const ray=ref.current?.cesiumElement?.camera.getPickRay(position);
-            if(ray){
-                return (
-                    <REntity position={ref.current?.cesiumElement?.scene.globe.pick(ray, ref.current.cesiumElement.scene)} 
-                            point={{pixelSize: 10, color: Color.WHITE, heightReference: HeightReference.CLAMP_TO_GROUND}}
-                            >
-                    </REntity>
+        {
+            selectTaskContext.selectTask.boundary.length > 0 ? 
+            (
+                <>
+                <REntity name="TaskPolygon">
+                    <PolygonGraphics
+                    hierarchy={Cartesian3.fromDegreesArray(selectTaskContext.selectTask.boundary.flat()) as any}
+                    height={0}
+                    material={new ColorMaterialProperty(
+                        Color.AZURE.withAlpha(0.7)
+                    )}/>
+                </REntity>
+                {selectTaskContext.selectTask.boundary.map((point) => {
+                    return(
+                        <REntity
+                            position={Cartesian3.fromDegrees(point[0],point[1],0)}>
+                                <PointGraphics color={Color.WHITE} pixelSize={10}/>
+                        </REntity>
                     )
-            }
-        })} */}
+                })}
+                </>
+            ) : (<></>)
+        }
     </Viewer>
     )
 }

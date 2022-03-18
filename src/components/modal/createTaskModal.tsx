@@ -1,15 +1,18 @@
-import { Button, Input, Modal, Select } from "antd";
+import { Button, Checkbox, Input, Modal, Select } from "antd";
 import { Cartesian3 } from "cesium";
 import { useContext, useEffect, useState} from "react";
 import { getTaskUavList, postCreateTask } from "../../api/taskAPI";
 import { IsCreateTaskContext } from "../../context/taskContext";
+import { IsDrawPointType } from "../../interface/taskType";
 
 
 
 const {Option} = Select;
 
 const CreateTaskModal: React.FC<{onDrawClick: any
-                                 polygonRegion: Cartesian3[]}> = ({onDrawClick, polygonRegion}) => {
+                                 polygonRegion: Cartesian3[]
+                                 isDrawPoint: IsDrawPointType
+                                 targetPoint: Cartesian3[]}> = ({onDrawClick, polygonRegion,targetPoint, isDrawPoint}) => {
     const createTaskContext = useContext(IsCreateTaskContext);
     const [taskName, setTaskName] = useState<string>('');
     const [uavList, setUavList] = useState<string[]>(['1','2','3']);
@@ -30,14 +33,19 @@ const CreateTaskModal: React.FC<{onDrawClick: any
         })
         //更新任务的状态
         if(status === 'success') console.log('post create task success');
+        isDrawPoint.setIsDrawPoint(false);
         console.log([uavList, taskName, polygonRegion]);
     };
-
+    const handleOnPlaning = () => {
+        createTaskContext.setIsCreateTaskModal(false);
+        isDrawPoint.setIsDrawPoint(true);
+    }
     useEffect(() => {
         //getUavList
         const fetchData =async () => {
             const data = await getTaskUavList();
-            setUavList(data);
+            setUavList(data.map(item => item.droneId));
+            console.log(data);
         }
         fetchData();
     }, [])
@@ -63,7 +71,24 @@ const CreateTaskModal: React.FC<{onDrawClick: any
     </div>
     <div>
         <Button type="primary" style={{marginTop: 20, marginLeft: '10%'}} onClick={() => {onDrawClick(); createTaskContext.setIsCreateTaskModal(false);}}>绘制区域</Button>
+        <Checkbox checked={isDrawPoint.isDrawPoint} onChange={e=>isDrawPoint.setIsDrawPoint(e.target.checked)}
+                  style={{marginLeft: '20%'}}>路径规划</Checkbox>
     </div>
+    {isDrawPoint.isDrawPoint ? (
+        <>
+        <div>
+            <Button type="primary" style={{marginTop: 20, marginLeft:'10%'}}
+                    onClick={handleOnPlaning}>选择区域目标点</Button>
+            <Select style={{marginLeft: '20%', width:'20%'}}>
+                <Option value='tree'>最小生成树</Option>
+                <Option value='norma'>一般</Option>
+            </Select>
+        </div>
+        </>
+    ) : (
+        <>
+        </>
+    )}
     </Modal>
     </>
   );

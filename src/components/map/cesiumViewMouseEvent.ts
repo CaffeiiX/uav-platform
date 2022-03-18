@@ -83,9 +83,9 @@ function CesiumViewMouseEvent(viewer: CesiumViewer,
         handler.current.setInputAction((event : CesiumMovementEvent) => {
             activePolygonPoints.pop();
             createPolygonEntity(viewer, activePolygonPoints);
+            console.log(activePolygonPoints);
             viewer.entities.remove(floatingPoint);
             viewer.entities.remove(activePolygon);
-            console.log(activePolygonPoints);
             setPolygonRegion(activePolygonPoints);
             floatingPoint = undefined;
             activePolygon = undefined;

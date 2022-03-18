@@ -1,22 +1,35 @@
 import "antd/dist/antd.css";
 import { Layout } from "antd";
-import React, { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import MapViewer from "./map/mapViewer";
 import "./mainView.css";
 import CreateTaskModal from "./modal/createTaskModal";
 import Control from "./control/control";
 import {
-  IsCreateTaskContext, SelectTaskContext,
+  IsCreateTaskContext,
+  SelectTaskContext,
 } from "../context/taskContext";
 import Task from "./task/task";
 import Cartesian3 from "cesium/Source/Core/Cartesian3";
-import { TaskInfoType, UavWsDataType } from "../interface/taskType";
+import {
+  TaskInfoType,
+  UavWsDataType,
+  uavPositionAndTimeType,
+} from "../interface/taskType";
 import { getUuid } from "../utils/utils";
 import { getUavListInTask } from "../api/taskAPI";
 
 const { Content, Sider } = Layout;
 
 const MapViewerMemo = memo(MapViewer);
+
 const MainView: React.FC<{}> = () => {
   // const [collapsed, setCollapsed] = useState(false);
   const [isCreateTaskModalShow, setCreateTaskModalShow] =
@@ -24,62 +37,98 @@ const MainView: React.FC<{}> = () => {
   const [isDrawPolygon, setIsDrawPolygon] = useState<boolean>(false);
   const [drawPolygonRegion, setDrawPolygonRegion] = useState<Cartesian3[]>([]);
   const [selectTask, setSelectTask] = useState<TaskInfoType>({
-      'name': '名称',
-      'Id': '',
-      'date': '时间',
-      'status': '',
-      'boundary': []
+    name: "名称",
+    Id: "",
+    date: "时间",
+    status: "",
+    boundary: [],
   });
+  // const [targetPointStatus, setTargetPointStatus] = useState<TargetPointType>();
+  // 绘制目标点内容
+  const [isDrawPoint, setIsDrawPoint] = useState<boolean>(false);
+  const [targetPointCol, setTargetPointCol] = useState<Cartesian3[]>([]);
+
+  // websocket部分
+  const ws = useRef<WebSocket | null>(null);
+  const [message, setMessage] = useState("");
+  const [readyState, setReadyState] = useState("正在链接中");
+
   // 任务对应的无人机列表
   const [selectUavList, setSelectUavList] = useState<string[]>([]);
+  const [uavPosition, setUavPosition] = useState<uavPositionAndTimeType>();
+  // 选择的无人机信息
+  const [selectUavId, setSelectUavId] = useState<string>("");
   useEffect(() => {
-    const fetchData =async (taskId: string) => {
+    const fetchData = async (taskId: string) => {
       const data = await getUavListInTask(taskId);
-      setSelectUavList(data);
-    }
+      setSelectUavList(data.map((item) => item.droneId));
+    };
     fetchData(selectTask.Id);
-  }, [selectTask.Id])
+  }, [selectTask.Id]);
 
   // const [isDrawTaskPolygon, setIsDrawTaskPolygon] = useState<boolean>(false);
   // WebSocket
-  const ws = useRef<WebSocket | null>(null);
-  const [message, setMessage] = useState('');
-  const [readyState, setReadyState] = useState('正在链接中');
 
   const webSocketInit = useCallback(() => {
     const stateArr = [
-      '正在链接中',
-      '已经链接并且可以通讯',
-      '连接正在关闭',
-      '连接已关闭或者没有链接成功',
+      "正在链接中",
+      "已经链接并且可以通讯",
+      "连接正在关闭",
+      "连接已关闭或者没有链接成功",
     ];
-    if(!ws.current || ws.current.readyState === 3){
-      ws.current = new WebSocket(`ws://192.168.61.91:30094/web/websocket/${getUuid()}`);
-      ws.current.onopen = _e => setReadyState(stateArr[ws.current?.readyState ?? 0]);
-      ws.current.onclose = _e => setReadyState(stateArr[ws.current?.readyState ?? 0]);
-      ws.current.onerror = _e => setReadyState(stateArr[ws.current?.readyState ?? 0]);
-      ws.current.onmessage = e => {
-        setMessage(e.data);
-        const wsData: UavWsDataType = JSON.parse(message.slice(0, message.length - 1));
-        
-        console.log(wsData);
+    if (!ws.current || ws.current.readyState === 3) {
+      ws.current = new WebSocket(
+        `ws://192.168.61.91:30094/web/websocket/${getUuid()}`
+      );
+      ws.current.onopen = (_e) =>
+        setReadyState(stateArr[ws.current?.readyState ?? 0]);
+      ws.current.onclose = (_e) =>
+        setReadyState(stateArr[ws.current?.readyState ?? 0]);
+      ws.current.onerror = (_e) =>
+        setReadyState(stateArr[ws.current?.readyState ?? 0]);
+      ws.current.onmessage = (e) => {
+        // setMessage(e.data);
+        if (e.data.length > 4) {
+          setMessage(e.data);
+        }
       };
     }
-  }, [ws])
+  }, [ws]);
 
   useLayoutEffect(() => {
     webSocketInit();
-    return() => {
+    return () => {
       ws.current?.close();
     };
   }, [ws, webSocketInit]);
 
-
+  useEffect(() => {
+    if (message.length > 4) {
+      const wsData: UavWsDataType = JSON.parse(
+        message.slice(0, message.length - 1)
+      );
+      if (wsData.UAV_id === selectUavId) {
+        setUavPosition({
+          longtitude: wsData.GPSPosition_longitude,
+          latitute: wsData.GPSPosition_latitude,
+          height: wsData.GPSPosition_altitude,
+          time: wsData.UAV_time * 1000,
+        });
+        // console.log(new Date(wsData.UAV_time * 1000))
+      }
+    }
+  }, [message, selectUavId]);
   return (
     <>
       <Layout style={{ minHeight: "100vh" }}>
         <Control></Control>
         {/* <Sider className="mainview-sider" collapsible collapsed={collapsed} onCollapse={()=> setCollapsed(!collapsed)} width={240}> */}
+        {/* <TargetPointContext.Provider
+          value={{
+            targetPointStatus: targetPointStatus,
+            setTargetPointStatus: setTargetPointStatus,
+          }}
+        > */}
         <IsCreateTaskContext.Provider
           value={{
             isCreateTaskModal: isCreateTaskModalShow,
@@ -91,51 +140,83 @@ const MainView: React.FC<{}> = () => {
               setIsDrawPolygon(true);
             }}
             polygonRegion={drawPolygonRegion}
+            isDrawPoint={{
+              isDrawPoint: isDrawPoint,
+              setIsDrawPoint: setIsDrawPoint
+            }}
+            targetPoint={targetPointCol}
           ></CreateTaskModal>
         </IsCreateTaskContext.Provider>
-
+        {/* </TargetPointContext.Provider> */}
         <Layout>
           <Sider className="mainview-sider" width={240}>
             <SelectTaskContext.Provider
-            value={{
-              selectTask: selectTask,
-              setSelectTask: setSelectTask
-            }}>
-            <IsCreateTaskContext.Provider
               value={{
-                isCreateTaskModal: isCreateTaskModalShow,
-                setIsCreateTaskModal: setCreateTaskModalShow,
+                selectTask: selectTask,
+                setSelectTask: setSelectTask,
               }}
             >
-              <Task></Task>
-            </IsCreateTaskContext.Provider>
+              <IsCreateTaskContext.Provider
+                value={{
+                  isCreateTaskModal: isCreateTaskModalShow,
+                  setIsCreateTaskModal: setCreateTaskModalShow,
+                }}
+              >
+                <Task
+                  uavMessage={uavPosition}
+                  selectedUavList={selectUavList}
+                  selectUavId={{
+                    selectUavId: selectUavId,
+                    setSelectUavId: setSelectUavId,
+                  }}
+                ></Task>
+              </IsCreateTaskContext.Provider>
             </SelectTaskContext.Provider>
           </Sider>
           <Content className="mainview-content">
-            <SelectTaskContext.Provider
-            value={{
-              selectTask: selectTask,
-              setSelectTask: setSelectTask
-            }}>
-            <IsCreateTaskContext.Provider
+            {/* <TargetPointContext.Provider
               value={{
-                isCreateTaskModal: isCreateTaskModalShow,
-                setIsCreateTaskModal: setCreateTaskModalShow,
+                targetPointStatus: targetPointStatus,
+                setTargetPointStatus: setTargetPointStatus,
+              }}
+            > */}
+            <SelectTaskContext.Provider
+              value={{
+                selectTask: selectTask,
+                setSelectTask: setSelectTask,
               }}
             >
-              {/* <MapViewerMemo isDrawPolygon={[isDrawPolygon,setIsDrawPolygon]}/> */}
-              <MapViewerMemo
-                isDrawPolygon={{
-                  isDrawPolygon: isDrawPolygon,
-                  setIsDrwaPolygon: setIsDrawPolygon,
+              <IsCreateTaskContext.Provider
+                value={{
+                  isCreateTaskModal: isCreateTaskModalShow,
+                  setIsCreateTaskModal: setCreateTaskModalShow,
                 }}
-                drawPolygonRegion = {{
-                  polygonRegion: drawPolygonRegion,
-                  setPolygonRegion: setDrawPolygonRegion
-                }}
-              />
-            </IsCreateTaskContext.Provider>
+              >
+                {/* <MapViewerMemo isDrawPolygon={[isDrawPolygon,setIsDrawPolygon]}/> */}
+                {
+                  <MapViewerMemo
+                    isDrawPolygon={{
+                      isDrawPolygon: isDrawPolygon,
+                      setIsDrwaPolygon: setIsDrawPolygon,
+                    }}
+                    drawPolygonRegion={{
+                      polygonRegion: drawPolygonRegion,
+                      setPolygonRegion: setDrawPolygonRegion,
+                    }}
+                    uavMessage={uavPosition}
+                    targetPointCol={{
+                      targetPoint: targetPointCol,
+                      setTargetPoint: setTargetPointCol
+                    }}
+                    isDrawPoint={{
+                      isDrawPoint: isDrawPoint,
+                      setIsDrawPoint: setIsDrawPoint
+                    }}
+                  />
+                }
+              </IsCreateTaskContext.Provider>
             </SelectTaskContext.Provider>
+            {/* </TargetPointContext.Provider> */}
           </Content>
         </Layout>
       </Layout>

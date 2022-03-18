@@ -1,7 +1,8 @@
-import { Cartesian3 } from "cesium";
+import { Cartesian3, Cartographic, JulianDate, Math as CMath, SampledPositionProperty } from "cesium";
+import { uavPositionAndTimeType } from "../interface/taskType";
 
 const polygonToWKTString = (polygon: Cartesian3[]) => {
-    let wktString = 'POLYGON((';
+    let wktString = 'POLyGON((';
     for(let point of polygon){
         wktString += (String(point.x) + ' ' + String(point.y) + ',');
     }
@@ -28,4 +29,44 @@ const getUuid = () => {
         return v.toString(16);
     });
 }
-export {polygonToWKTString, polygonCenter, getUuid}
+
+const computeFlight = (source: uavPositionAndTimeType[]) => {
+    let property = new SampledPositionProperty();
+    for(let i = 0;i < source.length; i ++) {
+        let time = JulianDate.fromDate(new Date(source[i].time), new JulianDate());
+        let position  = Cartesian3.fromDegrees(source[i].longtitude, source[i].latitute, source[i].height);
+        property.addSample(time, position);
+    }
+    return property;
+}
+
+const Cartesian3ToDegrees = (point: Cartesian3) => {
+    const pointCarto = Cartographic.fromCartesian(
+        point
+    );
+    return [CMath.toDegrees(pointCarto.longitude), CMath.toDegrees(pointCarto.latitude)];
+}
+
+const IsPointInPolygon = (point: Cartesian3, polygon: Cartesian3[]) => {
+    const pointCount = polygon.length;
+    if(pointCount < 3) return false;
+    let j = pointCount - 1;
+    let zeroState = 0;
+    let oddNodes = false;
+    for(let k =0;  k < pointCount; k ++) {
+        const ptK  = polygon[k];
+        const ptJ = polygon[j];
+        if (((ptK.y > point.y) !== (ptJ.y > point.y)) && (point.x < (ptJ.x - ptK.x) * (point.y - ptK.y) / (ptJ.y - ptK.y) + ptK.x)) {
+            oddNodes = !oddNodes;
+            if (ptK.y > ptJ.y) {
+                zeroState++;
+            }
+            else {
+                zeroState--;
+            }
+        }
+        j = k;
+    }
+    return oddNodes;
+}
+export {polygonToWKTString, polygonCenter, getUuid, computeFlight, Cartesian3ToDegrees, IsPointInPolygon}

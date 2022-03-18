@@ -45,7 +45,7 @@ const getTaskUavInfo = async (taskId: string) => {
 
 const getTaskUavList =async () => {
     const response = await axios.get(`${baseUrl}/queryDroneStatus`);
-    const uavList : string[] = response.data.data;
+    const uavList : UavListInTaskType[] = response.data.data;
     return uavList;
 }
 
@@ -69,13 +69,18 @@ const postCreateTask = async (postParams: postParamsType) => {
     else return 'fail';
 }
 
+type UavListInTaskType = {
+    droneId: string,
+    droneName: string,
+    droneStatus: string
+}
 const getUavListInTask = async (taskId: string) => {
     const response = await axios.get(`${baseUrl}/queryStatusOfDrone`, {
         params: {
             taskId: taskId
         }
     })
-    const uavList : string[] = response.data.data;
+    const uavList : UavListInTaskType[] = response.data.data;
     return uavList;
 }
 

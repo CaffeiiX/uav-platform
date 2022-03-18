@@ -18,7 +18,7 @@ const TaskList : React.FC<{select: (task: TaskInfoType) => void, selectedTask: T
     }, [pageNum])
     return (
         <>
-        <Table className="table-task-list" size="small" dataSource={taskList} columns={columns} 
+        <Table className="table-task-list" size="small" dataSource={taskList} columns={columns}
                pagination={{pageSize: 3, total: 20, onChange: (e)=>{setPageNum(e)}}} 
                onRow={record => {
                    return {
@@ -29,7 +29,8 @@ const TaskList : React.FC<{select: (task: TaskInfoType) => void, selectedTask: T
                }}
                rowClassName={record => {
                    return record.Id === selectedTask.Id ? 'table-task-row' : '';
-               }} ></Table>
+               }} 
+               rowKey={record => record.Id}></Table>
         </>
     )
 }

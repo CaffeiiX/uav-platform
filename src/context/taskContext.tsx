@@ -1,3 +1,4 @@
+import Cartesian3 from "cesium/Source/Core/Cartesian3";
 import { createContext} from "react";
 import { TaskInfoType } from "../interface/taskType";
 
@@ -48,4 +49,22 @@ const SelectTaskContext = createContext<SelectTaskContext>({
     setSelectTask: () => {}
 }
 )
-export {IsCreateTaskContext, isDrawPolygonContext, SelectTaskContext};
+type SelectUavId = {
+    selectUavId: string,
+    setSelectUavId: (c: string) => void;
+}
+const SelectUavIdContext = createContext<SelectUavId>({
+    selectUavId: '',
+    setSelectUavId: ()=> {}
+})
+
+// type TargetPointStatusType = {
+//     targetPointStatus: TargetPointType | undefined
+//     setTargetPointStatus: (c: TargetPointType | undefined) => void
+// }
+
+// const TargetPointContext = createContext<TargetPointStatusType>({
+//     targetPointStatus: undefined,
+//     setTargetPointStatus: () => {}
+// })
+export {IsCreateTaskContext, isDrawPolygonContext, SelectTaskContext,SelectUavIdContext};

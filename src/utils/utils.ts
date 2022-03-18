@@ -2,11 +2,14 @@ import { Cartesian3, Cartographic, JulianDate, Math as CMath, SampledPositionPro
 import { uavPositionAndTimeType } from "../interface/taskType";
 
 const polygonToWKTString = (polygon: Cartesian3[]) => {
+
     let wktString = 'POLyGON((';
     for(let point of polygon){
-        wktString += (String(point.x) + ' ' + String(point.y) + ',');
+        const pointDegree = Cartesian3ToDegrees(point);
+        wktString += (String(pointDegree[0]) + ' ' + String(pointDegree[1]) + ',');
     }
-    wktString += (String(polygon[0].x) + ' ' + String(polygon[0].y) + '))');
+    const pointDegree = Cartesian3ToDegrees(polygon[0]);
+    wktString += (String(pointDegree[0]) + ' ' + String(pointDegree[1]) + '))');
     return wktString;
 }
 

@@ -12,10 +12,7 @@ import MapViewer from "./map/mapViewer";
 import "./mainView.css";
 import CreateTaskModal from "./modal/createTaskModal";
 import Control from "./control/control";
-import {
-  IsCreateTaskContext,
-  SelectTaskContext,
-} from "../context/taskContext";
+import { IsCreateTaskContext, SelectTaskContext } from "../context/taskContext";
 import Task from "./task/task";
 import Cartesian3 from "cesium/Source/Core/Cartesian3";
 import {
@@ -58,6 +55,9 @@ const MainView: React.FC<{}> = () => {
   const [uavPosition, setUavPosition] = useState<uavPositionAndTimeType>();
   // 选择的无人机信息
   const [selectUavId, setSelectUavId] = useState<string>("");
+  //path
+  const [palnPathCol, setPlanPathCol] = useState<number[][]>([[]]);
+
   useEffect(() => {
     const fetchData = async (taskId: string) => {
       const data = await getUavListInTask(taskId);
@@ -114,7 +114,6 @@ const MainView: React.FC<{}> = () => {
           height: wsData.GPSPosition_altitude,
           time: wsData.UAV_time * 1000,
         });
-        // console.log(new Date(wsData.UAV_time * 1000))
       }
     }
   }, [message, selectUavId]);
@@ -142,9 +141,10 @@ const MainView: React.FC<{}> = () => {
             polygonRegion={drawPolygonRegion}
             isDrawPoint={{
               isDrawPoint: isDrawPoint,
-              setIsDrawPoint: setIsDrawPoint
+              setIsDrawPoint: setIsDrawPoint,
             }}
             targetPoint={targetPointCol}
+            setPlanPathCol={setPlanPathCol}
           ></CreateTaskModal>
         </IsCreateTaskContext.Provider>
         {/* </TargetPointContext.Provider> */}
@@ -206,12 +206,13 @@ const MainView: React.FC<{}> = () => {
                     uavMessage={uavPosition}
                     targetPointCol={{
                       targetPoint: targetPointCol,
-                      setTargetPoint: setTargetPointCol
+                      setTargetPoint: setTargetPointCol,
                     }}
                     isDrawPoint={{
                       isDrawPoint: isDrawPoint,
-                      setIsDrawPoint: setIsDrawPoint
+                      setIsDrawPoint: setIsDrawPoint,
                     }}
+                    planPathCol={palnPathCol}
                   />
                 }
               </IsCreateTaskContext.Provider>

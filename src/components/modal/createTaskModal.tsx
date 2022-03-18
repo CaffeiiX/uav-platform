@@ -1,9 +1,10 @@
 import { Button, Checkbox, Input, Modal, Select } from "antd";
 import { Cartesian3 } from "cesium";
 import { useContext, useEffect, useState} from "react";
-import { getTaskUavList, postCreateTask } from "../../api/taskAPI";
+import { getTaskUavList, postCreateTask, PostPathPlanData } from "../../api/taskAPI";
 import { IsCreateTaskContext } from "../../context/taskContext";
 import { IsDrawPointType } from "../../interface/taskType";
+import { Cartesian3ToDegrees } from "../../utils/utils";
 
 
 
@@ -12,13 +13,25 @@ const {Option} = Select;
 const CreateTaskModal: React.FC<{onDrawClick: any
                                  polygonRegion: Cartesian3[]
                                  isDrawPoint: IsDrawPointType
-                                 targetPoint: Cartesian3[]}> = ({onDrawClick, polygonRegion,targetPoint, isDrawPoint}) => {
+                                 targetPoint: Cartesian3[]
+                                 setPlanPathCol: (c: number[][]) => void}
+                                 > = ({onDrawClick, polygonRegion,targetPoint, isDrawPoint, setPlanPathCol}) => {
     const createTaskContext = useContext(IsCreateTaskContext);
     const [taskName, setTaskName] = useState<string>('');
     const [uavList, setUavList] = useState<string[]>(['1','2','3']);
     const [selectUavList, setSetlectUavList] = useState<string[]>([]);
 
     const handleOnOk = async () => {
+        if(isDrawPoint){
+            if(taskName === '' || selectUavList.length === 0 || polygonRegion.length === 0 || targetPoint.length === 0){
+                alert('请输入规划数据');
+                return
+            }
+            const targetPointList = targetPoint.map(item => Cartesian3ToDegrees(item));
+            const polygonRegionList = polygonRegion.map(item => Cartesian3ToDegrees(item));
+            const response = await PostPathPlanData(selectUavList.length,targetPointList, polygonRegionList);
+            setPlanPathCol(response);
+        }
         if(taskName === '' || selectUavList.length === 0 || polygonRegion.length === 0){
             alert('请输入数据');
             return;
@@ -33,6 +46,8 @@ const CreateTaskModal: React.FC<{onDrawClick: any
         })
         //更新任务的状态
         if(status === 'success') console.log('post create task success');
+        setSetlectUavList([]);
+        setTaskName('');
         isDrawPoint.setIsDrawPoint(false);
         console.log([uavList, taskName, polygonRegion]);
     };

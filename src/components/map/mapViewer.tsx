@@ -14,6 +14,7 @@ import {
   Clock,
   PathGraphics,
   CesiumMovementEvent,
+  PolylineGraphics,
 } from "resium";
 // import { Entity as REntity }  from "resium";
 import {
@@ -57,7 +58,12 @@ const osmStyle = new MapboxStyleImageryProvider({
   accessToken:
     "pk.eyJ1IjoiY2FpdzA0MjEiLCJhIjoiY2tyNTkycTdrMzA4MzJ1cWg5ajhmczhmOSJ9.BB9GKYcs2TrLbM_koPoIbQ",
 });
-
+const ColorCol = [
+  Color.RED,
+  Color.BLUE,
+  Color.YELLOW,
+  Color.WHITE
+]
 const CamerFlyToMemo = React.memo(CameraFlyTo);
 // const amap = new UrlTemplateImageryProvider({
 //     url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
@@ -69,14 +75,16 @@ const CamerFlyToMemo = React.memo(CameraFlyTo);
 //     minimumLevel: 4,
 //     maximumLevel: 18
 // });
-
+const EntityMemo = React.memo(REntity);
+const PolygonGraphicsMemo = React.memo(PolygonGraphics);
 const MapViewer: React.FC<{
   isDrawPolygon: drawPolygonState;
   drawPolygonRegion: drawPolygonRegion;
   uavMessage: uavPositionAndTimeType | undefined;
   targetPointCol: TargetPointColType;
-  isDrawPoint: IsDrawPointType
-}> = ({ isDrawPolygon, drawPolygonRegion, uavMessage, targetPointCol, isDrawPoint}) => {
+  isDrawPoint: IsDrawPointType;
+  planPathCol: number[][];
+}> = ({ isDrawPolygon, drawPolygonRegion, uavMessage, targetPointCol, isDrawPoint, planPathCol}) => {
   const createTaskContext = useContext(IsCreateTaskContext);
   const ref = useRef<CesiumComponentRef<CesiumViewer>>(null);
   let mouseHandler = useRef<ScreenSpaceEventHandler | undefined>(undefined);
@@ -106,7 +114,6 @@ const MapViewer: React.FC<{
     if(isDrawPoint.isDrawPoint){
       createTaskContext.setIsCreateTaskModal(true);
       //请求路径接口写这
-      targetPointCol.setTargetPoint([]);
     }
   }
   // const [isDrawPolygon, setIsDrawPolygon] = useState<boolean>(true);
@@ -175,8 +182,8 @@ const MapViewer: React.FC<{
       <CamerFlyToMemo destination={cameraDestination}></CamerFlyToMemo>
       {selectTaskContext.selectTask.boundary.length > 0 ? (
         <>
-          <REntity name="TaskPolygon">
-            <PolygonGraphics
+          <EntityMemo name="TaskPolygon">
+            <PolygonGraphicsMemo
               hierarchy={
                 Cartesian3.fromDegreesArray(
                   selectTaskContext.selectTask.boundary.flat()
@@ -185,7 +192,7 @@ const MapViewer: React.FC<{
               height={0}
               material={new ColorMaterialProperty(Color.AZURE.withAlpha(0.7))}
             />
-          </REntity>
+          </EntityMemo>
           {selectTaskContext.selectTask.boundary.map((point) => {
             return (
               <REntity position={Cartesian3.fromDegrees(point[0], point[1], 0)}>
@@ -239,6 +246,29 @@ const MapViewer: React.FC<{
          })}
        </>) : 
       (<></>)}
+      {
+        (planPathCol.length > 0 && planPathCol[0].length > 0) ? (
+          <>
+          {console.log(planPathCol)}
+          {planPathCol.map((item, index) => { return (
+          <REntity>
+            <PolylineGraphics
+            positions={Cartesian3.fromDegreesArray(item)}
+            width={5}
+            material={
+              new PolylineGlowMaterialProperty({
+                color: ColorCol[index]
+              })
+            }
+            />
+          </REntity>)})}
+          </>
+        ):
+        (
+          <>
+          </>
+        )
+      }
     </Viewer>
   );
 };

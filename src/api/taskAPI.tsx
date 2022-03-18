@@ -83,6 +83,21 @@ const getUavListInTask = async (taskId: string) => {
     const uavList : UavListInTaskType[] = response.data.data;
     return uavList;
 }
+type PostPlanPathType = {
+    polygonCoods: number[][],
+    targetCoods: number[][],
+    droneNum: number
+}
+const PostPathPlanData =async (uavCount: number, targetPointList: number[][], polygonRegion: number[][]) => {
+    
+    const response = await axios.post("http://192.168.1.104:9090/web/droneRoutePlanning",{
+        polygonCoods: polygonRegion,
+        targetCoods: targetPointList,
+        droneNum: uavCount
+    });
+    const pathResList: number[][] = response.data.data;
+    console.log(pathResList);
+    return pathResList;
+}
 
-
-export {getTaskInfo, getTaskUavInfo, getTaskUavList, postCreateTask, getUavListInTask};
+export {getTaskInfo, getTaskUavInfo, getTaskUavList, postCreateTask, getUavListInTask, PostPathPlanData};

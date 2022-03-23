@@ -34,7 +34,7 @@ const ControlPanel : React.FC <{plugin: Plugins,
         <>
         <Layout className="panel" style={{left: window.innerWidth / 2 - 150, height: 48}} >
           <Collapse defaultActiveKey={['']} onChange={changeCollpse}>
-          <Panel key = "1" header="控制面板" className="panel-collapse">
+          <Panel key = "1" header="插件管理" className="panel-collapse">
               <div className="control-div">
                   <span>组件类型：</span>
                   <Select defaultValue={optionValue} onChange={onSelectedChange}>

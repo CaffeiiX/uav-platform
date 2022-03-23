@@ -144,7 +144,6 @@ const MainView: React.FC<{}> = () => {
               setIsDrawPoint: setIsDrawPoint,
             }}
             targetPoint={targetPointCol}
-            setPlanPathCol={setPlanPathCol}
           ></CreateTaskModal>
         </IsCreateTaskContext.Provider>
         {/* </TargetPointContext.Provider> */}

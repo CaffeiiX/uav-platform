@@ -1,9 +1,26 @@
 import { Button, Radio } from "antd";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import 'antd/dist/antd.css';
 import './taskControl.css';
+import { SelectTaskContext } from "../../context/taskContext";
+import { PostFinishTaskAPI } from "../../api/taskAPI";
 const TaskControl : React.FC<{onCreateTaskShowModal: () => void }> = ({onCreateTaskShowModal}) => {
     const [value, setValue] = useState(0);
+    const selectTaskContext = useContext(SelectTaskContext);
+    const onFinishTaskButton = () => {
+        const status =async () => {
+            await PostFinishTaskAPI(selectTaskContext.selectTask.Id);
+        }
+        let isFinish = window.confirm(`是否结束任务：${selectTaskContext.selectTask.name}`);
+        if(isFinish){
+            status();
+            selectTaskContext.setSelectTask({
+                ...selectTaskContext.selectTask,
+                status: '2'
+            })
+        }
+        else return;
+    }
     return (
         <>
         <div className="header">
@@ -16,7 +33,7 @@ const TaskControl : React.FC<{onCreateTaskShowModal: () => void }> = ({onCreateT
         <Button className="task-button" disabled={value === 0 ? false: true} onClick={onCreateTaskShowModal}>
             创建任务
         </Button>
-        <Button className="task-button" disabled={true}>
+        <Button className="task-button" disabled={selectTaskContext.selectTask.Id === ""} onClick={onFinishTaskButton}>
             结束任务
         </Button>
         </>

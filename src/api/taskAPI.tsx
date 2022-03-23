@@ -2,7 +2,7 @@ import axios from "axios";
 import { Cartesian3 } from "cesium";
 import { TaskInfoApiType, TaskInfoType, UavInfoType } from "../interface/taskType";
 import { polygonToWKTString } from "../utils/utils";
-
+import qs from 'qs'
 const baseUrl = 'http://192.168.61.91:30094/web/';
 const getTaskInfo = async (num: number, pageSize: number = 3,taskType: number, ) => {
     const response = await axios.get(`${baseUrl}/queryTaskList`, {
@@ -90,14 +90,21 @@ type PostPlanPathType = {
 }
 const PostPathPlanData =async (uavCount: number, targetPointList: number[][], polygonRegion: number[][]) => {
     
-    const response = await axios.post("http://192.168.1.104:9090/web/droneRoutePlanning",{
+    const response = await axios.post(`${baseUrl}/droneRoutePlanning`,{
         polygonCoods: polygonRegion,
         targetCoods: targetPointList,
         droneNum: uavCount
     });
     const pathResList: number[][] = response.data.data;
-    console.log(pathResList);
     return pathResList;
 }
 
-export {getTaskInfo, getTaskUavInfo, getTaskUavList, postCreateTask, getUavListInTask, PostPathPlanData};
+const PostFinishTaskAPI =async (taskId: string) => {
+    const response = await axios.post(`${baseUrl}/finishTask`, qs.stringify({
+        task_id: taskId
+    }));
+    if(response.data.msg === "操作成功") return 'success';
+    else return 'fail';
+}
+
+export {getTaskInfo, getTaskUavInfo, getTaskUavList, postCreateTask, getUavListInTask, PostPathPlanData, PostFinishTaskAPI};

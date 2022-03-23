@@ -1,10 +1,10 @@
-import { Button, Checkbox, Input, Modal, Select } from "antd";
+import { Button, Checkbox, Input, Modal, Select, Radio, RadioChangeEvent} from "antd";
 import { Cartesian3 } from "cesium";
 import { useContext, useEffect, useState} from "react";
-import { getTaskUavList, postCreateTask, PostPathPlanData } from "../../api/taskAPI";
-import { IsCreateTaskContext } from "../../context/taskContext";
+import { getTaskUavList, postCreateTask } from "../../api/taskAPI";
+import { IsCreateTaskContext} from "../../context/taskContext";
 import { IsDrawPointType } from "../../interface/taskType";
-import { Cartesian3ToDegrees } from "../../utils/utils";
+import PathPlanModal from "../modal/pathPlanModal"
 
 
 
@@ -13,25 +13,27 @@ const {Option} = Select;
 const CreateTaskModal: React.FC<{onDrawClick: any
                                  polygonRegion: Cartesian3[]
                                  isDrawPoint: IsDrawPointType
-                                 targetPoint: Cartesian3[]
-                                 setPlanPathCol: (c: number[][]) => void}
-                                 > = ({onDrawClick, polygonRegion,targetPoint, isDrawPoint, setPlanPathCol}) => {
+                                 targetPoint: Cartesian3[]}> = ({onDrawClick, polygonRegion,targetPoint, isDrawPoint}) => {
     const createTaskContext = useContext(IsCreateTaskContext);
     const [taskName, setTaskName] = useState<string>('');
     const [uavList, setUavList] = useState<string[]>(['1','2','3']);
     const [selectUavList, setSetlectUavList] = useState<string[]>([]);
+    const [selectAreaList, setSetlectAreaList] = useState<string[]>([]);
+    const [areaValue,setValue] = useState(1);
+    const [platformValue,setValue2] = useState(1);
+    const [isPathPlanModalChecked, setIsPathPlanModalChecked] = useState<boolean>(false);
+
+    
+    const onAreaChange = (e:RadioChangeEvent) => {
+      console.log('指定区域', e.target.value);
+      setValue(e.target.value);
+    };
+    const onPlatformChange = (e:RadioChangeEvent) => {
+        console.log('平台区位', e.target.value);
+        setValue2(e.target.value);
+      };
 
     const handleOnOk = async () => {
-        if(isDrawPoint){
-            if(taskName === '' || selectUavList.length === 0 || polygonRegion.length === 0 || targetPoint.length === 0){
-                alert('请输入规划数据');
-                return
-            }
-            const targetPointList = targetPoint.map(item => Cartesian3ToDegrees(item));
-            const polygonRegionList = polygonRegion.map(item => Cartesian3ToDegrees(item));
-            const response = await PostPathPlanData(selectUavList.length,targetPointList, polygonRegionList);
-            setPlanPathCol(response);
-        }
         if(taskName === '' || selectUavList.length === 0 || polygonRegion.length === 0){
             alert('请输入数据');
             return;
@@ -42,12 +44,10 @@ const CreateTaskModal: React.FC<{onDrawClick: any
             droneIds: selectUavList,
             task_bounary: polygonRegion,
             task_status: '1',
-            task_type: '1' 
+            task_type: '1'
         })
         //更新任务的状态
         if(status === 'success') console.log('post create task success');
-        setSetlectUavList([]);
-        setTaskName('');
         isDrawPoint.setIsDrawPoint(false);
         console.log([uavList, taskName, polygonRegion]);
     };
@@ -72,9 +72,40 @@ const CreateTaskModal: React.FC<{onDrawClick: any
            title= {'创建任务'}>
     <div>
         <span>{'任务名: '}</span>
-        <Input style={{width: '80%'}} value = {taskName} onChange={(e) => {setTaskName(e.target.value)}}></Input>
+        <Input style={{width: '86%'}} value = {taskName} onChange={(e) => {setTaskName(e.target.value)}}></Input>
+    </div>
+    <div style={{width: '100%', marginTop: 10}}>
+        <span>{'指定区域: '}</span>
+        <Radio.Group onChange={onAreaChange} value={areaValue}>
+      <Radio value={1}>绘制</Radio>
+      <Radio value={2}>导入</Radio>
+    </Radio.Group>
+    <Button type="primary" style={{marginTop: 20, marginLeft: '6%'}} onClick={() => {}}>确定</Button>
+    </div>
+
+    <div style={{width: '100%', marginTop: 10}}>
+        <span>{'平台区位: '}</span>
+        <Radio.Group onChange={onPlatformChange} value={platformValue}>
+      <Radio value={1}>绘制</Radio>
+      <Radio value={2}>实时获取</Radio>
+    </Radio.Group>
+    <Button type="primary" style={{marginTop: 20}} onClick={() => {}}>确定</Button>
     </div>
     <div>
+        <span>{'指定无人机: '}</span>
+        <Select style={{width: '40%', marginTop: 5}} 
+                onChange={(e) => {
+                setSetlectAreaList(e);}}>
+        </Select>
+        <Select mode="multiple" style={{width: '40%', marginTop: 10}} 
+                onChange={(e) => {
+                setSetlectUavList(e);}}>
+            {uavList.map((item) => {
+                return <Option value={item} key={item}>{item}</Option>
+            })}
+        </Select>
+    </div>
+    {/* <div>
         <span>{'无人机: '}</span>
         <Select mode="multiple" style={{width: '80%', marginTop: 10}} 
                 onChange={(e) => {
@@ -83,22 +114,15 @@ const CreateTaskModal: React.FC<{onDrawClick: any
                 return <Option value={item} key={item}>{item}</Option>
             })}
         </Select>
-    </div>
+    </div> */}
     <div>
-        <Button type="primary" style={{marginTop: 20, marginLeft: '10%'}} onClick={() => {onDrawClick(); createTaskContext.setIsCreateTaskModal(false);}}>绘制区域</Button>
-        <Checkbox checked={isDrawPoint.isDrawPoint} onChange={e=>isDrawPoint.setIsDrawPoint(e.target.checked)}
-                  style={{marginLeft: '20%'}}>路径规划</Checkbox>
+        {/* <Button type="primary" style={{marginTop: 20, marginLeft: '10%'}} onClick={() => {onDrawClick(); createTaskContext.setIsCreateTaskModal(false);}}>绘制区域</Button> */}
+        <Checkbox onChange={e => setIsPathPlanModalChecked(e.target.checked)} checked={isPathPlanModalChecked}
+                  style={{marginTop: 10}}>路径规划</Checkbox>
     </div>
-    {isDrawPoint.isDrawPoint ? (
+    {isPathPlanModalChecked ? (
         <>
-        <div>
-            <Button type="primary" style={{marginTop: 20, marginLeft:'10%'}}
-                    onClick={handleOnPlaning}>选择区域目标点</Button>
-            <Select style={{marginLeft: '20%', width:'20%'}}>
-                <Option value='tree'>最小生成树</Option>
-                <Option value='norma'>一般</Option>
-            </Select>
-        </div>
+        <PathPlanModal></PathPlanModal>
         </>
     ) : (
         <>

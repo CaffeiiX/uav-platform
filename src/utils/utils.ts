@@ -1,5 +1,6 @@
+
 import { Cartesian3, Cartographic, JulianDate, Math as CMath, SampledPositionProperty } from "cesium";
-import { uavPositionAndTimeType } from "../interface/taskType";
+import { PlatformUav, uavPositionAndTimeType } from "../interface/taskType";
 
 const polygonToWKTString = (polygon: Cartesian3[]) => {
 
@@ -72,4 +73,13 @@ const IsPointInPolygon = (point: Cartesian3, polygon: Cartesian3[]) => {
     }
     return oddNodes;
 }
-export {polygonToWKTString, polygonCenter, getUuid, computeFlight, Cartesian3ToDegrees, IsPointInPolygon}
+const fliterUavList = (uavList: string[], platformUavList: PlatformUav, selectPlatform: string) => {
+    let otherPlatUavList: string[] = []
+    for(let key in platformUavList){
+        if(key !== selectPlatform){
+            otherPlatUavList = [...otherPlatUavList, ...platformUavList[key]]
+        }
+    }
+    return uavList.filter(item => otherPlatUavList.indexOf(item) === -1);
+}
+export {polygonToWKTString, polygonCenter, getUuid, computeFlight, Cartesian3ToDegrees, IsPointInPolygon, fliterUavList}

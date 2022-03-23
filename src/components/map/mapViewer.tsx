@@ -15,6 +15,7 @@ import {
   PathGraphics,
   CesiumMovementEvent,
   PolylineGraphics,
+  BillboardGraphics,
 } from "resium";
 // import { Entity as REntity }  from "resium";
 import {
@@ -37,8 +38,16 @@ import {
   IsCreateTaskContext,
   SelectTaskContext,
 } from "../../context/taskContext";
-import { Cartesian3ToDegrees, IsPointInPolygon, polygonCenter } from "../../utils/utils";
-import { IsDrawPointType, TargetPointColType, uavPositionAndTimeType } from "../../interface/taskType";
+import {
+  Cartesian3ToDegrees,
+  IsPointInPolygon,
+  polygonCenter,
+} from "../../utils/utils";
+import {
+  IsDrawPointType,
+  TargetPointColType,
+  uavPositionAndTimeType,
+} from "../../interface/taskType";
 
 type drawPolygonState = {
   isDrawPolygon: boolean;
@@ -58,12 +67,7 @@ const osmStyle = new MapboxStyleImageryProvider({
   accessToken:
     "pk.eyJ1IjoiY2FpdzA0MjEiLCJhIjoiY2tyNTkycTdrMzA4MzJ1cWg5ajhmczhmOSJ9.BB9GKYcs2TrLbM_koPoIbQ",
 });
-const ColorCol = [
-  Color.RED,
-  Color.BLUE,
-  Color.YELLOW,
-  Color.WHITE
-]
+const ColorCol = [Color.RED, Color.BLUE, Color.YELLOW, Color.WHITE];
 const CamerFlyToMemo = React.memo(CameraFlyTo);
 // const amap = new UrlTemplateImageryProvider({
 //     url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
@@ -84,7 +88,18 @@ const MapViewer: React.FC<{
   targetPointCol: TargetPointColType;
   isDrawPoint: IsDrawPointType;
   planPathCol: number[][];
-}> = ({ isDrawPolygon, drawPolygonRegion, uavMessage, targetPointCol, isDrawPoint, planPathCol}) => {
+  isDrawPlatform: IsDrawPointType;
+  platformPointCol: TargetPointColType;
+}> = ({
+  isDrawPolygon,
+  drawPolygonRegion,
+  uavMessage,
+  targetPointCol,
+  isDrawPoint,
+  planPathCol,
+  isDrawPlatform,
+  platformPointCol,
+}) => {
   const createTaskContext = useContext(IsCreateTaskContext);
   const ref = useRef<CesiumComponentRef<CesiumViewer>>(null);
   let mouseHandler = useRef<ScreenSpaceEventHandler | undefined>(undefined);
@@ -96,26 +111,60 @@ const MapViewer: React.FC<{
   const property = useRef<SampledPositionProperty>(
     new SampledPositionProperty()
   );
-  const handleOnClick = (event : CesiumMovementEvent) => {
-    if(isDrawPoint.isDrawPoint && event.position && ref.current?.cesiumElement){
-      const viewer = ref.current.cesiumElement
-      const ray=viewer.camera.getPickRay(event.position);
+  const handleOnClick = (event: CesiumMovementEvent) => {
+    if (
+      isDrawPoint.isDrawPoint &&
+      event.position &&
+      ref.current?.cesiumElement
+    ) {
+      const viewer = ref.current.cesiumElement;
+      const ray = viewer.camera.getPickRay(event.position);
       const earthPosition = viewer.scene.globe.pick(ray, viewer.scene);
-      if(defined(earthPosition)){
-        if(earthPosition){
-          if(IsPointInPolygon(earthPosition, drawPolygonRegion.polygonRegion)){
-            targetPointCol.setTargetPoint([...targetPointCol.targetPoint, earthPosition]);
+      if (defined(earthPosition)) {
+        if (earthPosition) {
+          if (
+            IsPointInPolygon(earthPosition, drawPolygonRegion.polygonRegion)
+          ) {
+            targetPointCol.setTargetPoint([
+              ...targetPointCol.targetPoint,
+              earthPosition,
+            ]);
           }
         }
       }
-  }
+    }
+    if (
+      isDrawPlatform.isDrawPoint &&
+      event.position &&
+      ref.current?.cesiumElement
+    ) {
+      const viewer = ref.current.cesiumElement;
+      const ray = viewer.camera.getPickRay(event.position);
+      const earthPosition = viewer.scene.globe.pick(ray, viewer.scene);
+      if (defined(earthPosition)) {
+        if (earthPosition) {
+          if (
+            IsPointInPolygon(earthPosition, drawPolygonRegion.polygonRegion)
+          ) {
+            platformPointCol.setTargetPoint([
+              ...platformPointCol.targetPoint,
+              earthPosition,
+            ]);
+          }
+        }
+      }
+    }
+    
   };
   const handleRightButton = () => {
-    if(isDrawPoint.isDrawPoint){
+    if (isDrawPoint.isDrawPoint) {
       createTaskContext.setIsCreateTaskModal(true);
       //请求路径接口写这
     }
-  }
+    if(isDrawPlatform.isDrawPoint) {
+      createTaskContext.setIsCreateTaskModal(true);
+    }
+  };
   // const [isDrawPolygon, setIsDrawPolygon] = useState<boolean>(true);
   //鼠标绘制范围事件
   useEffect(() => {
@@ -151,7 +200,6 @@ const MapViewer: React.FC<{
     });
     property.current.backwardExtrapolationType = ExtrapolationType.HOLD;
     property.current.forwardExtrapolationType = ExtrapolationType.HOLD;
-    console.log(property);
   }, []);
   useEffect(() => {
     if (uavMessage) {
@@ -164,7 +212,9 @@ const MapViewer: React.FC<{
         uavMessage.latitute,
         uavMessage.height
       );
-      setCameraDestination(Cartesian3.fromDegrees(uavMessage.longtitude, uavMessage.latitute, 1000))
+      setCameraDestination(
+        Cartesian3.fromDegrees(uavMessage.longtitude, uavMessage.latitute, 1000)
+      );
       property.current.addSample(time, position);
     }
   }, [uavMessage]);
@@ -172,7 +222,9 @@ const MapViewer: React.FC<{
     <Viewer
       imageryProvider={osm}
       style={{ height: window.innerHeight }}
-      onClick={(e) => {handleOnClick(e);}}
+      onClick={(e) => {
+        handleOnClick(e);
+      }}
       ref={ref}
       onMouseDown={(e) => {}}
       onRightClick={handleRightButton}
@@ -204,10 +256,7 @@ const MapViewer: React.FC<{
       ) : (
         <></>
       )}
-      <Clock
-        multiplier={1}
-        shouldAnimate={true}
-      />
+      <Clock multiplier={1} shouldAnimate={true} />
       <REntity
         id="random"
         position={property.current}
@@ -235,40 +284,49 @@ const MapViewer: React.FC<{
           width={10}
         />
       </REntity>
-      {isDrawPoint.isDrawPoint ? 
-      (<>
-         {targetPointCol.targetPoint.map(point => {
-           return(
-             <REntity position={point}>
-               <PointGraphics color={Color.WHITE} pixelSize={10}/>
-             </REntity>
-           )
-         })}
-       </>) : 
-      (<></>)}
-      {
-        (planPathCol.length > 0 && planPathCol[0].length > 0) ? (
-          <>
-          {console.log(planPathCol)}
-          {planPathCol.map((item, index) => { return (
-          <REntity>
-            <PolylineGraphics
-            positions={Cartesian3.fromDegreesArray(item)}
-            width={5}
-            material={
-              new PolylineGlowMaterialProperty({
-                color: ColorCol[index]
-              })
-            }
-            />
-          </REntity>)})}
-          </>
-        ):
-        (
-          <>
-          </>
-        )
-      }
+      {isDrawPoint.isDrawPoint ? (
+        <>
+          {targetPointCol.targetPoint.map((point) => {
+            return (
+              <REntity position={point}>
+                <PointGraphics color={Color.WHITE} pixelSize={10} />
+              </REntity>
+            );
+          })}
+        </>
+      ) : (
+        <></>
+      )}
+      {planPathCol.length > 0 && planPathCol[0].length > 0 ? (
+        <>
+          {planPathCol.map((item, index) => {
+            return (
+              <REntity>
+                <PolylineGraphics
+                  positions={Cartesian3.fromDegreesArray(item)}
+                  width={5}
+                  material={
+                    new PolylineGlowMaterialProperty({
+                      color: ColorCol[index],
+                    })
+                  }
+                />
+              </REntity>
+            );
+          })}
+        </>
+      ) : (
+        <></>
+      )}
+      {isDrawPlatform.isDrawPoint ? (
+        <>
+        {platformPointCol.targetPoint.map(item => { return (
+          <REntity position={item}>
+            <BillboardGraphics image={'./facility.gif'}></BillboardGraphics>
+          </REntity>
+        )})}
+        </>
+      ) : (<></>)}
     </Viewer>
   );
 };

@@ -83,7 +83,9 @@ type IsDrawPointType ={
   isDrawPoint: boolean,
   setIsDrawPoint: (c: boolean) => void
 }
-
+type PlatformUav = {
+  [name: string]: string[]
+}
 export type {
   TaskInfoType,
   TaskInfoApiType,
@@ -93,5 +95,6 @@ export type {
   uavPositionAndTimeType,
   SelectUavIdType,
   TargetPointColType,
-  IsDrawPointType
+  IsDrawPointType,
+  PlatformUav
 };

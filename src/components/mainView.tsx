@@ -44,7 +44,8 @@ const MainView: React.FC<{}> = () => {
   // 绘制目标点内容
   const [isDrawPoint, setIsDrawPoint] = useState<boolean>(false);
   const [targetPointCol, setTargetPointCol] = useState<Cartesian3[]>([]);
-
+  const [isDrawPlatformPoint, setIsDrawPlatformPoint] = useState<boolean>(false);
+  const [platformPointCol, setPlatformPointCol] = useState<Cartesian3[]>([]);
   // websocket部分
   const ws = useRef<WebSocket | null>(null);
   const [message, setMessage] = useState("");
@@ -144,6 +145,13 @@ const MainView: React.FC<{}> = () => {
               setIsDrawPoint: setIsDrawPoint,
             }}
             targetPoint={targetPointCol}
+            isPlatformPoint={{
+              isDrawPoint: isDrawPlatformPoint,
+              setIsDrawPoint: setIsDrawPlatformPoint
+            }}
+            platformPoint={
+              platformPointCol
+            }
           ></CreateTaskModal>
         </IsCreateTaskContext.Provider>
         {/* </TargetPointContext.Provider> */}
@@ -212,6 +220,14 @@ const MainView: React.FC<{}> = () => {
                       setIsDrawPoint: setIsDrawPoint,
                     }}
                     planPathCol={palnPathCol}
+                    isDrawPlatform={{
+                      isDrawPoint: isDrawPlatformPoint,
+                      setIsDrawPoint: setIsDrawPlatformPoint
+                    }}
+                    platformPointCol={{
+                      targetPoint: platformPointCol,
+                      setTargetPoint: setPlatformPointCol
+                    }}
                   />
                 }
               </IsCreateTaskContext.Provider>

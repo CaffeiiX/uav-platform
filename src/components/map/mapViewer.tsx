@@ -39,7 +39,6 @@ import {
   SelectTaskContext,
 } from "../../context/taskContext";
 import {
-  Cartesian3ToDegrees,
   IsPointInPolygon,
   polygonCenter,
 } from "../../utils/utils";

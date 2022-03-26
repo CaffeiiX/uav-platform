@@ -21,6 +21,7 @@ const polygonCenter = (polygon: number[][]) => {
     polygon.map((point) => {
         lon += point[0];
         lat += point[1];
+        return point;
     })
     return Cartesian3.fromDegrees(lon / polygon.length, lat / polygon.length, 10000);
 }
@@ -55,7 +56,7 @@ const IsPointInPolygon = (point: Cartesian3, polygon: Cartesian3[]) => {
     const pointCount = polygon.length;
     if(pointCount < 3) return false;
     let j = pointCount - 1;
-    let zeroState = 0;
+    // let zeroState = 0;
     let oddNodes = false;
     for(let k =0;  k < pointCount; k ++) {
         const ptK  = polygon[k];
@@ -63,10 +64,10 @@ const IsPointInPolygon = (point: Cartesian3, polygon: Cartesian3[]) => {
         if (((ptK.y > point.y) !== (ptJ.y > point.y)) && (point.x < (ptJ.x - ptK.x) * (point.y - ptK.y) / (ptJ.y - ptK.y) + ptK.x)) {
             oddNodes = !oddNodes;
             if (ptK.y > ptJ.y) {
-                zeroState++;
+                // zeroState++;
             }
             else {
-                zeroState--;
+                // zeroState--;
             }
         }
         j = k;

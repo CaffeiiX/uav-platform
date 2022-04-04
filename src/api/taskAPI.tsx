@@ -88,12 +88,13 @@ type PostPlanPathType = {
     targetCoods: number[][],
     droneNum: number
 }
-const PostPathPlanData =async (uavCount: number, targetPointList: number[][], polygonRegion: number[][]) => {
+const PostPathPlanDataAPI = async (uavCount: number, targetPointList: number[][], polygonRegion: number[][], uavPoint: number[][]) => {
     
     const response = await axios.post(`${baseUrl}/droneRoutePlanning`,{
         polygonCoods: polygonRegion,
         targetCoods: targetPointList,
-        droneNum: uavCount
+        droneNum: uavCount,
+        droneCoods: uavPoint
     });
     const pathResList: number[][] = response.data.data;
     return pathResList;
@@ -107,4 +108,4 @@ const PostFinishTaskAPI =async (taskId: string) => {
     else return 'fail';
 }
 
-export {getTaskInfo, getTaskUavInfo, getTaskUavList, postCreateTask, getUavListInTask, PostPathPlanData, PostFinishTaskAPI};
+export {getTaskInfo, getTaskUavInfo, getTaskUavList, postCreateTask, getUavListInTask, PostPathPlanDataAPI, PostFinishTaskAPI};

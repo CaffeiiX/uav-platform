@@ -57,7 +57,7 @@ const MainView: React.FC<{}> = () => {
   // 选择的无人机信息
   const [selectUavId, setSelectUavId] = useState<string>("");
   //path
-  const [palnPathCol, setPlanPathCol] = useState<number[][]>([[]]);
+  const [planPathCol, setPlanPathCol] = useState<number[][]>([[]]);
 
   useEffect(() => {
     const fetchData = async (taskId: string) => {
@@ -152,6 +152,7 @@ const MainView: React.FC<{}> = () => {
             platformPoint={
               platformPointCol
             }
+            setPlanPathCol={setPlanPathCol}
           ></CreateTaskModal>
         </IsCreateTaskContext.Provider>
         {/* </TargetPointContext.Provider> */}
@@ -181,12 +182,6 @@ const MainView: React.FC<{}> = () => {
             </SelectTaskContext.Provider>
           </Sider>
           <Content className="mainview-content">
-            {/* <TargetPointContext.Provider
-              value={{
-                targetPointStatus: targetPointStatus,
-                setTargetPointStatus: setTargetPointStatus,
-              }}
-            > */}
             <SelectTaskContext.Provider
               value={{
                 selectTask: selectTask,
@@ -219,7 +214,7 @@ const MainView: React.FC<{}> = () => {
                       isDrawPoint: isDrawPoint,
                       setIsDrawPoint: setIsDrawPoint,
                     }}
-                    planPathCol={palnPathCol}
+                    planPathCol={planPathCol}
                     isDrawPlatform={{
                       isDrawPoint: isDrawPlatformPoint,
                       setIsDrawPoint: setIsDrawPlatformPoint

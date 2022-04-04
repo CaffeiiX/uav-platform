@@ -9,15 +9,32 @@ import {
 } from "antd";
 import { Cartesian3 } from "cesium";
 import { useContext, useEffect, useState } from "react";
-import { getTaskUavList, postCreateTask } from "../../api/taskAPI";
+import { getTaskUavList, postCreateTask, PostPathPlanDataAPI } from "../../api/taskAPI";
 import { IsCreateTaskContext } from "../../context/taskContext";
 import { IsDrawPointType, PlatformUav} from "../../interface/taskType";
-import { fliterUavList } from "../../utils/utils";
+import { Cartesian3ToDegrees, fliterUavList } from "../../utils/utils";
 import PathPlanModal from "../modal/pathPlanModal";
 
 const { Option } = Select;
 
-
+const getUavList = (platformUav: PlatformUav) => {
+  let uavList : string[] = [];
+  for(let key in platformUav){
+    uavList = [...uavList, ...platformUav[key]]
+  }
+  return uavList;
+}
+const getUavPointList = (platformUav: PlatformUav, platformPointCol: Cartesian3[]) => {
+  let uavPointList : Cartesian3[] = [];
+  let platformIndex: number = 0;
+  for(let key in platformUav) {
+    for(let _ of platformUav[key]){
+      uavPointList.push(platformPointCol[platformIndex])
+    }
+    platformIndex += 1;
+  }
+  return uavPointList;
+}
 const CreateTaskModal: React.FC<{
   onDrawClick: any;
   polygonRegion: Cartesian3[];
@@ -25,18 +42,17 @@ const CreateTaskModal: React.FC<{
   targetPoint: Cartesian3[];
   isPlatformPoint: IsDrawPointType;
   platformPoint: Cartesian3[];
-}> = ({ onDrawClick, polygonRegion, targetPoint, isDrawPoint, isPlatformPoint, platformPoint}) => {
+  setPlanPathCol: (c: number[][]) => void 
+}> = ({ onDrawClick, polygonRegion, targetPoint, isDrawPoint, isPlatformPoint, platformPoint, setPlanPathCol}) => {
   const createTaskContext = useContext(IsCreateTaskContext);
   const [taskName, setTaskName] = useState<string>("");
   const [uavList, setUavList] = useState<string[]>(["1", "2", "3"]);
-  const [selectUavList, setSetlectUavList] = useState<string[]>([]);
 //   const [selectAreaList, setSetlectAreaList] = useState<string[]>([]);
   const [areaMode, setAreaMode] = useState(0);
   const [platformMode, setPlatformMode] = useState(0);
   //多选框的逻辑
   //每个无人机可选的无人机
   const [platformSelectUavList, setPlatformSelectUavList] = useState<PlatformUav>({});
-
   const [selectPlatform, setSelectPlatform] = useState<number>(-1);
   const [isPathPlanModalChecked, setIsPathPlanModalChecked] =
     useState<boolean>(false);
@@ -64,30 +80,38 @@ const CreateTaskModal: React.FC<{
       }
   }
   const handleOnOk = async () => {
-    if (
-      taskName === "" ||
-      selectUavList.length === 0 ||
-      polygonRegion.length === 0
-    ) {
-      alert("请输入数据");
-      return;
+    //根据是否选择路径规划部分
+    const uavList = getUavList(platformSelectUavList);
+
+    if(!isPathPlanModalChecked){
+      if(taskName === "" || uavList.length === 0 || polygonRegion.length === 0){
+        alert("请输入数据");
+        return;
+      }
+      const status = await postCreateTask({
+        task_name: taskName,
+        droneIds: uavList,
+        task_bounary: polygonRegion,
+        task_status: "1",
+        task_type: "1",
+      });
+      //更新任务的状态
+      if (status === "success") console.log("post create task success");
+    } else {
+      if(taskName === "" || uavList.length === 0 || polygonRegion.length === 0 || targetPoint.length === 0){
+        alert('请输入数据');
+        return;
+      }
+      const targetPointList = targetPoint.map(item => Cartesian3ToDegrees(item));
+      const polygonRegionList = polygonRegion.map(item => Cartesian3ToDegrees(item));
+      const uavPointList = getUavPointList(platformSelectUavList, platformPoint).map(item => Cartesian3ToDegrees(item));
+      const response = await PostPathPlanDataAPI(uavList.length,targetPointList, polygonRegionList, uavPointList);
+      console.log(response);
+      setPlanPathCol(response);
     }
     createTaskContext.setIsCreateTaskModal(false);
-    const status = await postCreateTask({
-      task_name: taskName,
-      droneIds: selectUavList,
-      task_bounary: polygonRegion,
-      task_status: "1",
-      task_type: "1",
-    });
-    //更新任务的状态
-    if (status === "success") console.log("post create task success");
     isDrawPoint.setIsDrawPoint(false);
-  };
-
-  const handleOnPlaning = () => {
-    createTaskContext.setIsCreateTaskModal(false);
-    isDrawPoint.setIsDrawPoint(true);
+    isPlatformPoint.setIsDrawPoint(false);
   };
   
   useEffect(() => {
@@ -154,7 +178,7 @@ const CreateTaskModal: React.FC<{
             <Radio value={0}>绘制</Radio>
             <Radio value={1}>实时获取</Radio>
           </Radio.Group>
-          <Button type="primary" style={{ marginTop: 20 }} onClick={() => {onPlatformClick()}} disabled={isPlatformPoint.isDrawPoint}>
+          <Button type="primary" style={{ marginTop: 20 }} onClick={onPlatformClick} disabled={isPlatformPoint.isDrawPoint}>
             确定
           </Button>
         </div>
@@ -194,16 +218,6 @@ const CreateTaskModal: React.FC<{
             })) : (<></>)}
           </Select>
         </div>
-        {/* <div>
-        <span>{'无人机: '}</span>
-        <Select mode="multiple" style={{width: '80%', marginTop: 10}} 
-                onChange={(e) => {
-                setSetlectUavList(e);}}>
-            {uavList.map((item) => {
-                return <Option value={item} key={item}>{item}</Option>
-            })}
-        </Select>
-    </div> */}
         <div>
           {/* <Button type="primary" style={{marginTop: 20, marginLeft: '10%'}} onClick={() => {onDrawClick(); createTaskContext.setIsCreateTaskModal(false);}}>绘制区域</Button> */}
           <Checkbox
@@ -216,7 +230,7 @@ const CreateTaskModal: React.FC<{
         </div>
         {isPathPlanModalChecked ? (
           <>
-            <PathPlanModal></PathPlanModal>
+            <PathPlanModal isDrawPoint={isDrawPoint}></PathPlanModal>
           </>
         ) : (
           <></>

@@ -16,6 +16,7 @@ import {
   CesiumMovementEvent,
   PolylineGraphics,
   BillboardGraphics,
+  EntityDescription,
 } from "resium";
 // import { Entity as REntity }  from "resium";
 import {
@@ -38,15 +39,14 @@ import {
   IsCreateTaskContext,
   SelectTaskContext,
 } from "../../context/taskContext";
-import {
-  IsPointInPolygon,
-  polygonCenter,
-} from "../../utils/utils";
+import { IsPointInPolygon, polygonCenter } from "../../utils/utils";
 import {
   IsDrawPointType,
   TargetPointColType,
   uavPositionAndTimeType,
 } from "../../interface/taskType";
+import ViewUavVisual from "./viewUavVisual";
+import Entity from "cesium/Source/DataSources/Entity";
 
 type drawPolygonState = {
   isDrawPolygon: boolean;
@@ -110,6 +110,8 @@ const MapViewer: React.FC<{
   const property = useRef<SampledPositionProperty>(
     new SampledPositionProperty()
   );
+  //控制时间部分
+
   const handleOnClick = (event: CesiumMovementEvent) => {
     if (
       isDrawPoint.isDrawPoint &&
@@ -135,7 +137,8 @@ const MapViewer: React.FC<{
     if (
       isDrawPlatform.isDrawPoint &&
       event.position &&
-      ref.current?.cesiumElement
+      ref.current?.cesiumElement &&
+      !isDrawPoint.isDrawPoint
     ) {
       const viewer = ref.current.cesiumElement;
       const ray = viewer.camera.getPickRay(event.position);
@@ -153,15 +156,16 @@ const MapViewer: React.FC<{
         }
       }
     }
-    
   };
   const handleRightButton = () => {
     if (isDrawPoint.isDrawPoint) {
       createTaskContext.setIsCreateTaskModal(true);
+      // isDrawPoint.setIsDrawPoint(false);
       //请求路径接口写这
     }
-    if(isDrawPlatform.isDrawPoint) {
+    if (isDrawPlatform.isDrawPoint) {
       createTaskContext.setIsCreateTaskModal(true);
+      // isDrawPlatform.setIsDrawPoint(false);
     }
   };
   // const [isDrawPolygon, setIsDrawPolygon] = useState<boolean>(true);
@@ -296,7 +300,7 @@ const MapViewer: React.FC<{
       ) : (
         <></>
       )}
-      {planPathCol.length > 0 && planPathCol[0].length > 0 ? (
+      {/* {planPathCol.length > 0 && planPathCol[0].length > 0 ? (
         <>
           {planPathCol.map((item, index) => {
             return (
@@ -316,16 +320,34 @@ const MapViewer: React.FC<{
         </>
       ) : (
         <></>
-      )}
+      )} */}
       {isDrawPlatform.isDrawPoint ? (
         <>
-        {platformPointCol.targetPoint.map(item => { return (
-          <REntity position={item}>
-            <BillboardGraphics image={'./facility.gif'}></BillboardGraphics>
-          </REntity>
-        )})}
+          {platformPointCol.targetPoint.map((item) => {
+            return (
+              <REntity position={item}>
+                <BillboardGraphics image={"./facility.gif"}></BillboardGraphics>
+              </REntity>
+            );
+          })}
         </>
-      ) : (<></>)}
+      ) : (
+        <></>
+      )}
+      {planPathCol.length > 0 && planPathCol[0].length > 0 ? (
+        // <ViewUavVisual pathPositionCol={planPathCol[0]} />
+
+        planPathCol.map((item, index) => {
+          return (
+            <ViewUavVisual
+              pathPositionCol={item}
+              color={ColorCol[index]}
+            ></ViewUavVisual>
+          );
+        })
+      ) : (
+        <></>
+      )}
     </Viewer>
   );
 };

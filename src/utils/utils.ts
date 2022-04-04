@@ -4,7 +4,7 @@ import { PlatformUav, uavPositionAndTimeType } from "../interface/taskType";
 
 const polygonToWKTString = (polygon: Cartesian3[]) => {
 
-    let wktString = 'POLyGON((';
+    let wktString = 'POLYGON((';
     for(let point of polygon){
         const pointDegree = Cartesian3ToDegrees(point);
         wktString += (String(pointDegree[0]) + ' ' + String(pointDegree[1]) + ',');

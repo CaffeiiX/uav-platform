@@ -10,10 +10,9 @@ import {
   TimeIntervalCollection,
   TimeInterval,
 } from "cesium";
-import VelocityOrientationProperty from "cesium/Source/DataSources/VelocityOrientationProperty";
 import Viewer from "cesium/Source/Widgets/Viewer/Viewer";
 import { useEffect, useState } from "react";
-import { Entity, useCesium, EntityDescription, PathGraphics } from "resium";
+import { Entity, useCesium, PathGraphics } from "resium";
 
 function computeCirclularFlight(
   start: JulianDate,

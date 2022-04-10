@@ -5,9 +5,11 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 // import MapViewer from './components/mapViewer';
 import MainViewer from './components/mainView';
+// import NewMainView from './components/newMainView';
 // import {Viewer} from "resium";
 ReactDOM.render(
   <React.StrictMode>
+    {/* <NewMainView /> */}
     <MainViewer />
   </React.StrictMode>,
   document.getElementById('root')

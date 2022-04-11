@@ -1,0 +1,38 @@
+.sider-article {
+  display: flex;
+}
+.sider-header {
+  width: 100%;
+  background-color: white;
+  flex: 0 0 auto;
+  justify-content: flex-start;
+  align-items: stretch;
+  border-bottom-width: 0.5px;
+  border-bottom-style: solid;
+  padding: 0.875rem 0.75rem
+}
+.header-content {
+  display: flex;
+  justify-content: space-between;
+}
+.close-button {
+  justify-content: end;
+  align-items: flex-end;
+}
+
+/* .content-sider {
+  position: absolute;
+  margin-left: 150px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  height: 100%;
+  z-index: 1000;
+}
+.content-sider-collpse{
+  position: absolute;
+  margin-left: 80px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  height: 100%;
+  z-index: 1000;
+} */

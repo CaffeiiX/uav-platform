@@ -1,4 +1,4 @@
-import { Layout, Menu, Breadcrumb, Drawer, Button} from "antd";
+import { Layout, Menu, Button} from "antd";
 import { useState } from "react";
 import {
   DesktopOutlined,
@@ -6,31 +6,38 @@ import {
   FileOutlined,
   TeamOutlined,
   UserOutlined,
+  ProfileFilled
 } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import "./newMainView.css";
+import NewMapViewer from "./map/newMapViewer";
+import SiderContent from "./siderContent";
+import { useRecoilState} from "recoil";
+import { isSiderShow } from "../store/view";
+import PureTask from "./pureTask/pureTask";
 const { SubMenu } = Menu;
-const { Header, Content, Footer, Sider } = Layout;
+const {Content, Sider } = Layout;
 
 const NewMainView: React.FC<{}> = () => {
   const [collapsed, setCollapse] = useState<boolean>(false);
-  const [visible, setVisible] = useState<boolean>(false);
+  // const [visible, setVisible] = useState<boolean>(false);
+  const [visible, setVisible] = useRecoilState(isSiderShow);
+
   const onCollapse = () => {
     setCollapse(!collapsed);
   };
   const showDrawer = () => {
     setVisible(!visible);
   };
-  const onClose = () => {
-    setVisible(false);
-  };
   return (
       <Layout style={{ minHeight: '100vh' }}>
-        <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
-          <div className="logo" />
+        <Sider collapsible collapsed={collapsed} onCollapse={onCollapse} width={150}>
+          <div className="logo" >
+            {/* <div style={{color: "white"}} >无人机平台</div> */}
+          </div>
           <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-            <Menu.Item key="1" icon={<PieChartOutlined />} onClick={showDrawer}>
-              Option 1
+            <Menu.Item key="1" icon={<ProfileFilled />} onClick={showDrawer}>
+              任务信息
             </Menu.Item>
             <Menu.Item key="2" icon={<DesktopOutlined />}>
               Option 2
@@ -49,21 +56,15 @@ const NewMainView: React.FC<{}> = () => {
             </Menu.Item>
           </Menu>
         </Sider>
-
-        <Sider collapsedWidth={0} collapsible collapsed={!visible}>
-        </Sider>
+        {/* <Sider collapsedWidth={0} collapsible collapsed={!visible} width={240} className="content-sider">
+        </Sider> */}
+        <SiderContent>
+          <PureTask></PureTask>
+        </SiderContent>
         <Layout className="site-layout">
-          <Header className="site-layout-background" style={{ padding: 0 }} />
-          <Content style={{ margin: '0 16px' }}>
-            <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>User</Breadcrumb.Item>
-              <Breadcrumb.Item>Bill</Breadcrumb.Item>
-            </Breadcrumb>
-            <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
-              Bill is a cat.
-            </div>
+          <Content style={{ margin: '0' }}>
+            <NewMapViewer></NewMapViewer>
           </Content>
-          <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
         </Layout>
       </Layout>
   );

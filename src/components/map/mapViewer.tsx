@@ -14,9 +14,7 @@ import {
   Clock,
   PathGraphics,
   CesiumMovementEvent,
-  PolylineGraphics,
   BillboardGraphics,
-  EntityDescription,
 } from "resium";
 // import { Entity as REntity }  from "resium";
 import {
@@ -47,6 +45,7 @@ import {
 } from "../../interface/taskType";
 import ViewUavVisual from "./viewUavVisual";
 import Entity from "cesium/Source/DataSources/Entity";
+
 
 type drawPolygonState = {
   isDrawPolygon: boolean;

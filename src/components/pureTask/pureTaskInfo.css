@@ -1,0 +1,20 @@
+.task-input {
+  width: 220px;
+  margin-top: 8px;
+}
+
+.task-info-panel {
+  margin-top: 8px;
+}
+
+.task-info-select {
+  width: 65px;
+}
+.task-info-switch {
+  margin-left: 5px;
+}
+.task-info-switch-span {
+  font-family: monospace;
+  color: black;
+  font-weight: bold;
+}

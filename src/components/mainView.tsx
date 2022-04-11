@@ -22,11 +22,12 @@ import {
 } from "../interface/taskType";
 import { getUuid } from "../utils/utils";
 import { getUavListInTask } from "../api/taskAPI";
+import VisualChart from "./visual/visualChart";
 
 const { Content, Sider } = Layout;
 
 const MapViewerMemo = memo(MapViewer);
-
+const VisualChartMemo = memo(VisualChart);
 const MainView: React.FC<{}> = () => {
   // const [collapsed, setCollapsed] = useState(false);
   const [isCreateTaskModalShow, setCreateTaskModalShow] =
@@ -40,6 +41,7 @@ const MainView: React.FC<{}> = () => {
     status: "",
     boundary: [],
   });
+  const [isShowChart, setIsShowChart] = useState<boolean>(false);
   // const [targetPointStatus, setTargetPointStatus] = useState<TargetPointType>();
   // 绘制目标点内容
   const [isDrawPoint, setIsDrawPoint] = useState<boolean>(false);
@@ -153,6 +155,7 @@ const MainView: React.FC<{}> = () => {
               platformPointCol
             }
             setPlanPathCol={setPlanPathCol}
+            setIsShowChart={setIsShowChart}
           ></CreateTaskModal>
         </IsCreateTaskContext.Provider>
         {/* </TargetPointContext.Provider> */}
@@ -229,6 +232,7 @@ const MainView: React.FC<{}> = () => {
             </SelectTaskContext.Provider>
             {/* </TargetPointContext.Provider> */}
           </Content>
+          <VisualChartMemo isShowChart={isShowChart} setIsShowChart={setIsShowChart}/>
         </Layout>
       </Layout>
     </>

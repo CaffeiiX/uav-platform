@@ -42,8 +42,9 @@ const CreateTaskModal: React.FC<{
   targetPoint: Cartesian3[];
   isPlatformPoint: IsDrawPointType;
   platformPoint: Cartesian3[];
-  setPlanPathCol: (c: number[][]) => void 
-}> = ({ onDrawClick, polygonRegion, targetPoint, isDrawPoint, isPlatformPoint, platformPoint, setPlanPathCol}) => {
+  setPlanPathCol: (c: number[][]) => void;
+  setIsShowChart: (c: boolean) => void; 
+}> = ({ onDrawClick, polygonRegion, targetPoint, isDrawPoint, isPlatformPoint, platformPoint, setPlanPathCol, setIsShowChart}) => {
   const createTaskContext = useContext(IsCreateTaskContext);
   const [taskName, setTaskName] = useState<string>("");
   const [uavList, setUavList] = useState<string[]>(["1", "2", "3"]);
@@ -108,6 +109,7 @@ const CreateTaskModal: React.FC<{
       const response = await PostPathPlanDataAPI(uavList.length,targetPointList, polygonRegionList, uavPointList);
       console.log(response);
       setPlanPathCol(response);
+      setIsShowChart(true);
     }
     createTaskContext.setIsCreateTaskModal(false);
     isDrawPoint.setIsDrawPoint(false);

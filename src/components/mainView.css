@@ -6,3 +6,12 @@
     font-size: 13px;
 }
 
+.mainview-sider-visual {
+    position: absolute;
+    left: 240px;
+    height: 280px;
+    bottom: 0px;
+    z-index: 1000;
+    background-color: rgb(248, 248, 248);
+}
+

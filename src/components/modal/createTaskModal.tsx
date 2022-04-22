@@ -9,10 +9,10 @@ import {
 } from "antd";
 import { Cartesian3 } from "cesium";
 import { useContext, useEffect, useState } from "react";
-import { getTaskUavList, postCreateTask, PostPathPlanDataAPI } from "../../api/taskAPI";
+import { getTaskUavList, postCreateTask, PostFetchNormalPathAPI, PostNormalPathAPI, PostPathPlanDataAPI } from "../../api/taskAPI";
 import { IsCreateTaskContext } from "../../context/taskContext";
 import { IsDrawPointType, PlatformUav} from "../../interface/taskType";
-import { Cartesian3ToDegrees, fliterUavList } from "../../utils/utils";
+import { Cartesian3ToDegrees, findDroneInPolygonVoroni, fliterUavList } from "../../utils/utils";
 import PathPlanModal from "../modal/pathPlanModal";
 
 const { Option } = Select;
@@ -57,7 +57,8 @@ const CreateTaskModal: React.FC<{
   const [selectPlatform, setSelectPlatform] = useState<number>(-1);
   const [isPathPlanModalChecked, setIsPathPlanModalChecked] =
     useState<boolean>(false);
-
+  //无人机方案选择
+  const [selectMethods, setSelectMethods] = useState<string>('');
   const onAreaChange = (e: RadioChangeEvent) => {
     setAreaMode(e.target.value);
   };
@@ -103,12 +104,14 @@ const CreateTaskModal: React.FC<{
         alert('请输入数据');
         return;
       }
+      console.log(targetPoint);
       const targetPointList = targetPoint.map(item => Cartesian3ToDegrees(item));
       const polygonRegionList = polygonRegion.map(item => Cartesian3ToDegrees(item));
       const uavPointList = getUavPointList(platformSelectUavList, platformPoint).map(item => Cartesian3ToDegrees(item));
+      // console.log(findDroneInPolygonVoroni(polygonRegionList, uavPointList));
       const response = await PostPathPlanDataAPI(uavList.length,targetPointList, polygonRegionList, uavPointList);
-      console.log(response);
-      setPlanPathCol(response);
+      const responseNormal = await PostNormalPathAPI(polygonRegionList, uavPointList);
+      setPlanPathCol(responseNormal);
       setIsShowChart(true);
     }
     createTaskContext.setIsCreateTaskModal(false);
@@ -122,7 +125,7 @@ const CreateTaskModal: React.FC<{
       const data = await getTaskUavList();
       setUavList(data.map((item) => item.droneId));
       //初始化selected
-      console.log(data);
+      // console.log(data);
     };
     fetchData();
   }, []);
@@ -173,7 +176,17 @@ const CreateTaskModal: React.FC<{
             确定
           </Button>
         </div>
-
+        {/* <div style={{width: '100%', marginTop: 10}}>
+          <span>选择方案：</span>
+          <Select style={{ width: "80%", marginTop: 5}}
+          onChange={(e) => {setSelectMethods(e)}}
+          defaultValue={''}>
+            <Option value={'1'}>无无人机规划方案</Option>
+            <Option value={'2'}>单无人机平扫方案</Option>
+            <Option value={'3'}>多无人机平扫方案</Option>
+            <Option value={'4'}>多无人机多目标方案</Option>
+          </Select>
+        </div> */}
         <div style={{ width: "100%", marginTop: 10 }}>
           <span>{"平台区位: "}</span>
           <Radio.Group onChange={onPlatformChange} value={platformMode} disabled={isPlatformPoint.isDrawPoint}>

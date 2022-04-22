@@ -68,16 +68,6 @@ const osmStyle = new MapboxStyleImageryProvider({
 });
 const ColorCol = [Color.RED, Color.BLUE, Color.YELLOW, Color.WHITE];
 const CamerFlyToMemo = React.memo(CameraFlyTo);
-// const amap = new UrlTemplateImageryProvider({
-//     url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
-//     minimumLevel: 4,
-//     maximumLevel: 18
-// })
-// const ampaMarker = new UrlTemplateImageryProvider({
-//     url: 'https://wprd01.is.autonavi.com/appmaptile?x={x}&y={y}&z={z}&lang=zh_cn&size=1&scl=1&style=8&ltype=11',
-//     minimumLevel: 4,
-//     maximumLevel: 18
-// });
 const EntityMemo = React.memo(REntity);
 const PolygonGraphicsMemo = React.memo(PolygonGraphics);
 const MapViewer: React.FC<{

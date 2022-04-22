@@ -21,7 +21,8 @@ const PathPlanModal: React.FC<{isDrawPoint: IsDrawPointType}> = ({isDrawPoint}) 
         <Select
           style={{ width: "80%", marginTop: 5}}
           onChange={(e) => {}}
-        ></Select>
+        >
+        </Select>
       </div>
       <div style={{ width: "100%", marginTop: 10 }}>
         <span>{"方案参数: "}</span>

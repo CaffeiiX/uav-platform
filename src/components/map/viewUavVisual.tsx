@@ -52,10 +52,13 @@ function computePathFlight(
   viewer: Viewer,
   color: Color
 ) {
-  console.log(pathPositionCol);
+  // console.log(pathPositionCol);
   const property = new SampledPositionProperty();
   for (let i = 0; i < pathPositionCol.length; i += 2) {
     const time = JulianDate.addSeconds(start, i * 20, new JulianDate());
+    if(isNaN(pathPositionCol[i])){
+      continue;
+    }
     const position = Cartesian3.fromDegrees(
       pathPositionCol[i],
       pathPositionCol[i + 1],

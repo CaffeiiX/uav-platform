@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Cartesian3 } from "cesium";
 import { TaskInfoApiType, TaskInfoType, UavInfoType } from "../interface/taskType";
-import { polygonToWKTString } from "../utils/utils";
+import { Cartesian3ToDegrees, DegreesToCartesian3, findDroneInPolygonVoroni, polygonToWKTString } from "../utils/utils";
 import qs from 'qs'
 const baseUrl = 'http://192.168.61.91:30094/web/';
 const getTaskInfo = async (num: number, pageSize: number = 3,taskType: number, ) => {
@@ -108,4 +108,87 @@ const PostFinishTaskAPI =async (taskId: string) => {
     else return 'fail';
 }
 
-export {getTaskInfo, getTaskUavInfo, getTaskUavList, postCreateTask, getUavListInTask, PostPathPlanDataAPI, PostFinishTaskAPI};
+// post uavstring
+const PostNormalPathAPI =async (polygonRegion: number[][], uavPoint: number[][]) => {
+    let points: string = '';
+    let drones: string = '';
+    const voronoiPolygon = findDroneInPolygonVoroni(polygonRegion, uavPoint);
+    const voronoiPolygonRegionList = voronoiPolygon.map((item)=>{
+        return item['geometry']['coordinates'];
+    })
+    for(let polygonRegionPoint of polygonRegion){
+        points += String(polygonRegionPoint[0]);
+        points += ',';
+        points += String(polygonRegionPoint[1]);
+        points += ';'
+    }
+    points = points.slice(0, points.length - 1);
+    for(let uav of uavPoint){
+        drones += String(uav[0]);
+        drones += ',';
+        drones += String(uav[1]);
+        drones += ';'
+    }
+    drones = drones.slice(0, drones.length - 1);
+    const postData = {
+        "points": points,
+        "height": '0.0005',
+        "sight": '1.5278',
+        "drones": drones,
+        'voronoiLines': voronoiPolygonRegionList
+    };
+    const response = await axios.post(`http://192.168.1.107:8080/find/multiple`,postData, {
+        headers: {
+            'Content-Type':'application/json'
+        }
+    });
+    const pathResList: number[][][] = response.data;
+    const pathLonLatRes: number[][] = [];
+    for(let path of pathResList){
+        let temp: number[] = [];
+        for(let point of path){
+            temp = [...temp, point[0], point[1]];
+        }
+        pathLonLatRes.push(temp);
+    }
+    return pathLonLatRes;
+}
+
+const PostFetchNormalPathAPI =async (polygonRegion: number[][], uavPoint: number[][]) => {
+    let points: string = '';
+    let drones: string = '';
+    const polygonRegionCartesian = DegreesToCartesian3(polygonRegion);
+    const uavCartesian = DegreesToCartesian3(uavPoint);
+    for(let polygonRegionPoint of polygonRegionCartesian){
+        points += String(polygonRegionPoint[0]);
+        points += ',';
+        points += String(polygonRegionPoint[1]);
+        points += ';'
+    }
+    points = points.slice(0, points.length - 1);
+    for(let uav of uavCartesian){
+        drones += String(uav[0]);
+        drones += ',';
+        drones += String(uav[1]);
+        drones += ';'
+    }
+    drones = drones.slice(0, drones.length - 1);
+    const postData = {
+        "points": points,
+        "height": 50,
+        "sight": 1.5278,
+        "drones": drones
+    };
+    const response = await fetch(`http://192.168.1.102:8080/find/multiple`, {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers:{
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(postData)
+    })
+    return response.json;
+}
+export {getTaskInfo, getTaskUavInfo, getTaskUavList, postCreateTask, getUavListInTask, PostPathPlanDataAPI, PostFinishTaskAPI, PostNormalPathAPI, PostFetchNormalPathAPI};

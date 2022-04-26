@@ -1,8 +1,7 @@
-import { Layout, Menu, Button} from "antd";
+import { Layout, Menu} from "antd";
 import { useState } from "react";
 import {
   DesktopOutlined,
-  PieChartOutlined,
   FileOutlined,
   TeamOutlined,
   UserOutlined,
@@ -29,6 +28,7 @@ const NewMainView: React.FC<{}> = () => {
   const showDrawer = () => {
     setVisible(!visible);
   };
+  
   return (
       <Layout style={{ minHeight: '100vh' }}>
         <Sider collapsible collapsed={collapsed} onCollapse={onCollapse} width={150}>

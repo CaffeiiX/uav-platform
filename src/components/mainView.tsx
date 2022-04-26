@@ -122,13 +122,6 @@ const MainView: React.FC<{}> = () => {
     <>
       <Layout style={{ minHeight: "100vh" }}>
         <Control></Control>
-        {/* <Sider className="mainview-sider" collapsible collapsed={collapsed} onCollapse={()=> setCollapsed(!collapsed)} width={240}> */}
-        {/* <TargetPointContext.Provider
-          value={{
-            targetPointStatus: targetPointStatus,
-            setTargetPointStatus: setTargetPointStatus,
-          }}
-        > */}
         <IsCreateTaskContext.Provider
           value={{
             isCreateTaskModal: isCreateTaskModalShow,

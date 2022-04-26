@@ -62,16 +62,16 @@ function computePathFlight(
     const position = Cartesian3.fromDegrees(
       pathPositionCol[i],
       pathPositionCol[i + 1],
-      CMath.nextRandomNumber() * 100 + 300
+      50,
     );
     property.addSample(time, position);
     viewer.entities.add({
       position: position,
       point: {
-        pixelSize: 8,
+        pixelSize: 3,
         color: Color.TRANSPARENT,
         outlineColor: color,
-        outlineWidth: 3,
+        outlineWidth: 1,
       },
     });
   }
@@ -128,13 +128,17 @@ color: Color}> = ({
       >
         <PathGraphics
           show={true}
+          resolution={1}
+          // material={
+          //   new PolylineGlowMaterialProperty({
+          //     glowPower: 0.1,
+          //     color: color,
+          //   })
+          // }
           material={
-            new PolylineGlowMaterialProperty({
-              glowPower: 0.1,
-              color: color,
-            })
+            color
           }
-          width={10}
+          width={2}
         />
       </Entity>
     </>

@@ -60,6 +60,8 @@ const MainView: React.FC<{}> = () => {
   const [selectUavId, setSelectUavId] = useState<string>("");
   //path
   const [planPathCol, setPlanPathCol] = useState<number[][]>([[]]);
+  //选择的绘制模式
+  const [selectMethod, setSelectMethod] = useState<string>('');
 
   useEffect(() => {
     const fetchData = async (taskId: string) => {
@@ -156,6 +158,8 @@ const MainView: React.FC<{}> = () => {
             }
             setPlanPathCol={setPlanPathCol}
             setIsShowChart={setIsShowChart}
+            selectMethods={selectMethod}
+            setSelectMethods={setSelectMethod}
           ></CreateTaskModal>
         </IsCreateTaskContext.Provider>
         {/* </TargetPointContext.Provider> */}
@@ -226,6 +230,7 @@ const MainView: React.FC<{}> = () => {
                       targetPoint: platformPointCol,
                       setTargetPoint: setPlatformPointCol
                     }}
+                    selectMethods={selectMethod}
                   />
                 }
               </IsCreateTaskContext.Provider>

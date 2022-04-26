@@ -102,27 +102,8 @@ function feature(type: string, coordinates: any) {
     };
   }
 const findDroneInPolygonVoroni = (polygonRegion: number[][], uavPoint: number[][]) => {
-    // const polygon = {
-    //    "type": "Feature",
-    //    "geometry": {
-    //        "type": "Polygon",
-    //        "coordinates": [...polygonRegion, polygonRegion[0]]
-    //    }
-    // }
     const polygon = feature('Polygon', [[...polygonRegion, polygonRegion[0]]]);
 
-    // const points = [
-    //     uavPoint.map((item) => {
-    //         return (
-    //             {   "type": "Feature",
-    //                 "geometry": {
-    //                     "type": "Point",
-    //                     "coordinates": item
-    //                 }
-    //             }
-    //         )
-    //     })
-    // ]
     const points = 
         uavPoint.map((item) => {
             return feature("Point", item);
@@ -130,4 +111,44 @@ const findDroneInPolygonVoroni = (polygonRegion: number[][], uavPoint: number[][
     
     return irregularVoronoi(polygon, points);
 }
-export {polygonToWKTString, polygonCenter, getUuid, computeFlight, Cartesian3ToDegrees, IsPointInPolygon, fliterUavList, DegreesToCartesian3, findDroneInPolygonVoroni}
+// 计算面积
+const calculatePolygonVoroniArea = (polygonRegion: number[][], uavPoint: number[][], uavList: string[]) => {
+    const polygon = feature('Polygon', [[...polygonRegion, polygonRegion[0]]]);
+
+    const points = 
+        uavPoint.map((item) => {
+            return feature("Point", item);
+        })
+    const voronoiPolygon = irregularVoronoi(polygon, points);
+    const voronoiPolygonRegionList = voronoiPolygon.map((item)=>{
+        return item['geometry']['coordinates'];
+    })
+    // voronoi = [[[114,30],[..]]..]
+    // uavPoint = [[],[]]
+    // let allArea: number = 0.0;
+    let uavArea: any = []
+    for(let i = 0 ; i < uavPoint.length; i ++){
+        // uavArea[uavList[i]] = calculatePolygonArea([uavPoint[i], ...voronoiPolygonRegionList[i][0]]);
+        uavArea.push({'value': calculatePolygonArea([uavPoint[i], ...voronoiPolygonRegionList[i][0]]),'name': uavList[i]})
+    }
+    return uavArea;
+}
+const calculateLength = (point1: number[], point2: number[]) => {
+    return Math.sqrt(Math.pow(point1[0]-point2[0], 2) + Math.pow(point1[1]-point2[1], 2))
+}
+const calculatePolygonArea = (pointList: number[][]) => {
+    let area = 0.0;
+    for(let i = 1; i < pointList.length - 1; i ++ ){
+        area += calculateTriangle([pointList[0], pointList[i], pointList[i+1]]);
+    }
+    return area;
+}
+const calculateTriangle = (triangle: number[][]) => {
+    const a = calculateLength(triangle[0], triangle[1]) * 1000;
+    const b = calculateLength(triangle[1], triangle[2]) * 1000;
+    const c = calculateLength(triangle[2], triangle[0]) * 1000;
+    const p = (a+b+c) / 2;
+    console.log(Math.sqrt(p*(p-a)*(p-b)*(p-c)));
+    return Math.sqrt(p*(p-a)*(p-b)*(p-c));
+}
+export {polygonToWKTString, polygonCenter, getUuid, computeFlight, Cartesian3ToDegrees, IsPointInPolygon, fliterUavList, DegreesToCartesian3, findDroneInPolygonVoroni, calculatePolygonVoroniArea}

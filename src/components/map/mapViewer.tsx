@@ -79,6 +79,7 @@ const MapViewer: React.FC<{
   planPathCol: number[][];
   isDrawPlatform: IsDrawPointType;
   platformPointCol: TargetPointColType;
+  selectMethods: string
 }> = ({
   isDrawPolygon,
   drawPolygonRegion,
@@ -88,6 +89,7 @@ const MapViewer: React.FC<{
   planPathCol,
   isDrawPlatform,
   platformPointCol,
+  selectMethods
 }) => {
   const createTaskContext = useContext(IsCreateTaskContext);
   const ref = useRef<CesiumComponentRef<CesiumViewer>>(null);
@@ -101,7 +103,7 @@ const MapViewer: React.FC<{
     new SampledPositionProperty()
   );
   //控制时间部分
-
+  
   const handleOnClick = (event: CesiumMovementEvent) => {
     if (
       isDrawPoint.isDrawPoint &&
@@ -142,6 +144,9 @@ const MapViewer: React.FC<{
               ...platformPointCol.targetPoint,
               earthPosition,
             ]);
+            if(selectMethods === '2'){
+              createTaskContext.setIsCreateTaskModal(true);
+            }
           }
         }
       }
@@ -209,6 +214,9 @@ const MapViewer: React.FC<{
         Cartesian3.fromDegrees(uavMessage.longtitude, uavMessage.latitute, 1000)
       );
       property.current.addSample(time, position);
+      if(ref.current?.cesiumElement){
+        ref.current.cesiumElement.scene.postProcessStages.fxaa.enabled = true;
+      }
     }
   }, [uavMessage]);
   return (

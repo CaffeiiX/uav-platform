@@ -28,7 +28,7 @@ const NewMainView: React.FC<{}> = () => {
   const showDrawer = () => {
     setVisible(!visible);
   };
-  
+
   return (
       <Layout style={{ minHeight: '100vh' }}>
         <Sider collapsible collapsed={collapsed} onCollapse={onCollapse} width={150}>
@@ -56,8 +56,6 @@ const NewMainView: React.FC<{}> = () => {
             </Menu.Item>
           </Menu>
         </Sider>
-        {/* <Sider collapsedWidth={0} collapsible collapsed={!visible} width={240} className="content-sider">
-        </Sider> */}
         <SiderContent>
           <PureTask></PureTask>
         </SiderContent>

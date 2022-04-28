@@ -137,7 +137,7 @@ const PostNormalPathAPI =async (polygonRegion: number[][], uavPoint: number[][])
         "drones": drones,
         'voronoiLines': voronoiPolygonRegionList
     };
-    const response = await axios.post(`http://192.168.1.107:8080/find/multiple`,postData, {
+    const response = await axios.post(`http://192.168.1.101:8080/find/multiple`,postData, {
         headers: {
             'Content-Type':'application/json'
         }

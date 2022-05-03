@@ -1,6 +1,6 @@
 const columns = [
     {
-        'title': '任务名称',
+        'title': '任务名',
         'dataIndex': 'name',
         'key': 'name',
         'className': 'table-task-col'
@@ -12,7 +12,7 @@ const columns = [
         'className': 'table-task-col'
     },
     {
-        'title': '任务状态',
+        'title': '状态',
         'dataIndex': 'status',
         'key': 'status',
         'className': 'table-task-col'

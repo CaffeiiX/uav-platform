@@ -8,6 +8,8 @@ type TaskInfoType = {
   status: string;
   boundary: number[][];
 };
+//
+// let a : TaskInfoType | undefined;
 
 type TaskDatetime = {
   date: number;
@@ -86,6 +88,12 @@ type IsDrawPointType ={
 type PlatformUav = {
   [name: string]: string[]
 }
+
+type UavListInTaskType = {
+  droneId: string,
+  droneName: string,
+  droneStatus: string
+}
 export type {
   TaskInfoType,
   TaskInfoApiType,
@@ -96,5 +104,6 @@ export type {
   SelectUavIdType,
   TargetPointColType,
   IsDrawPointType,
-  PlatformUav
+  PlatformUav,
+  UavListInTaskType
 };

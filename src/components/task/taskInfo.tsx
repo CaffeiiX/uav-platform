@@ -18,8 +18,8 @@ const TaskInfo: React.FC<{
   selectedUavList: string[];
   selectUavId: SelectUavIdType
 }> = ({ taskInfo, uavInfo, uavMessage, selectedUavList, selectUavId}) => {
-
   const [isChecked, setIsChecked] = useState<boolean>(false);
+  
   useEffect(() => {
     if(uavMessage){
       setIsChecked(true);

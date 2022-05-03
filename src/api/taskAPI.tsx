@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Cartesian3 } from "cesium";
-import { TaskInfoApiType, TaskInfoType, UavInfoType } from "../interface/taskType";
+import { TaskInfoApiType, TaskInfoType, UavInfoType,UavListInTaskType} from "../interface/taskType";
 import { polygonToWKTString } from "../utils/utils";
 import qs from 'qs'
 const baseUrl = 'http://192.168.61.91:30094/web/';
@@ -69,11 +69,11 @@ const postCreateTask = async (postParams: postParamsType) => {
     else return 'fail';
 }
 
-type UavListInTaskType = {
-    droneId: string,
-    droneName: string,
-    droneStatus: string
-}
+// type UavListInTaskType = {
+//     droneId: string,
+//     droneName: string,
+//     droneStatus: string
+// }
 const getUavListInTask = async (taskId: string) => {
     const response = await axios.get(`${baseUrl}/queryStatusOfDrone`, {
         params: {

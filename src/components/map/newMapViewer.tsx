@@ -1,21 +1,14 @@
 
-import {MapboxStyleImageryProvider, OpenStreetMapImageryProvider } from "cesium";
-import { Viewer, ImageryLayer} from "resium";
-
-
-const osm = new OpenStreetMapImageryProvider({
-  url: "https://a.tile.openstreetmap.org/",
-});
-const osmStyle = new MapboxStyleImageryProvider({
-  url: "https://api.mapbox.com/styles/v1/",
-  styleId: "cjgyyb8pp006x2rqkh6of7yjs",
-  // mapbox://styles/caiw0421/cl2hoz4s2004z14rzzz3w7ctm
-  username: "caiw0421",
-  accessToken:
-    "pk.eyJ1IjoiY2FpdzA0MjEiLCJhIjoiY2tyNTkycTdrMzA4MzJ1cWg5ajhmczhmOSJ9.BB9GKYcs2TrLbM_koPoIbQ",
-});
+import {Cartesian3} from "cesium";
+import { useState } from "react";
+import { Viewer, ImageryLayer, CameraFlyTo, CameraLookAt} from "resium";
+import { osm,osmStyle } from "./mapConfig";
 
 const NewMapViewer : React.FC<{}> = () => {
+  const [cameraDestination, setCameraDestination] = useState<Cartesian3>(
+    Cartesian3.fromDegrees(114.360734, 30.541093, 5000)
+  );
+  
   return (
     <>
     <Viewer
@@ -25,6 +18,8 @@ const NewMapViewer : React.FC<{}> = () => {
       infoBox={false}
     >
       <ImageryLayer imageryProvider={osmStyle}></ImageryLayer>
+      <CameraFlyTo destination={cameraDestination}></CameraFlyTo>
+      {/* <CameraLookAt target={cameraDestination} offset={{x:20, y : 20,z:10} as any}></CameraLookAt> */}
     </Viewer>
     </>
   )

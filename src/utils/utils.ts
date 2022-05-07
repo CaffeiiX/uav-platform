@@ -1,11 +1,11 @@
 
 import { Cartesian3, Cartographic, JulianDate, Math as CMath, SampledPositionProperty } from "cesium";
 import { PlatformUav, uavPositionAndTimeType } from "../interface/taskType";
-
+import irregularVoronoi from "./irregular-voronoi";
 const polygonToWKTString = (polygon: Cartesian3[]) => {
 
     let wktString = 'POLYGON((';
-    for(let point of polygon){
+    for (let point of polygon) {
         const pointDegree = Cartesian3ToDegrees(point);
         wktString += (String(pointDegree[0]) + ' ' + String(pointDegree[1]) + ',');
     }
@@ -16,8 +16,8 @@ const polygonToWKTString = (polygon: Cartesian3[]) => {
 
 //计算多边形中心位置
 const polygonCenter = (polygon: number[][]) => {
-    if(polygon.length === 0) return Cartesian3.fromDegrees(114.3, 30.5, 5000);
-    let [lon, lat] = [0,0]
+    if (polygon.length === 0) return Cartesian3.fromDegrees(114.3, 30.5, 5000);
+    let [lon, lat] = [0, 0]
     polygon.map((point) => {
         lon += point[0];
         lat += point[1];
@@ -37,9 +37,9 @@ const getUuid = () => {
 
 const computeFlight = (source: uavPositionAndTimeType[]) => {
     let property = new SampledPositionProperty();
-    for(let i = 0;i < source.length; i ++) {
+    for (let i = 0; i < source.length; i++) {
         let time = JulianDate.fromDate(new Date(source[i].time), new JulianDate());
-        let position  = Cartesian3.fromDegrees(source[i].longtitude, source[i].latitute, source[i].height);
+        let position = Cartesian3.fromDegrees(source[i].longtitude, source[i].latitute, source[i].height);
         property.addSample(time, position);
     }
     return property;
@@ -54,12 +54,12 @@ const Cartesian3ToDegrees = (point: Cartesian3) => {
 
 const IsPointInPolygon = (point: Cartesian3, polygon: Cartesian3[]) => {
     const pointCount = polygon.length;
-    if(pointCount < 3) return false;
+    if (pointCount < 3) return false;
     let j = pointCount - 1;
     // let zeroState = 0;
     let oddNodes = false;
-    for(let k =0;  k < pointCount; k ++) {
-        const ptK  = polygon[k];
+    for (let k = 0; k < pointCount; k++) {
+        const ptK = polygon[k];
         const ptJ = polygon[j];
         if (((ptK.y > point.y) !== (ptJ.y > point.y)) && (point.x < (ptJ.x - ptK.x) * (point.y - ptK.y) / (ptJ.y - ptK.y) + ptK.x)) {
             oddNodes = !oddNodes;
@@ -76,11 +76,52 @@ const IsPointInPolygon = (point: Cartesian3, polygon: Cartesian3[]) => {
 }
 const fliterUavList = (uavList: string[], platformUavList: PlatformUav, selectPlatform: string) => {
     let otherPlatUavList: string[] = []
-    for(let key in platformUavList){
-        if(key !== selectPlatform){
+    for (let key in platformUavList) {
+        if (key !== selectPlatform) {
             otherPlatUavList = [...otherPlatUavList, ...platformUavList[key]]
         }
     }
     return uavList.filter(item => otherPlatUavList.indexOf(item) === -1);
 }
-export {polygonToWKTString, polygonCenter, getUuid, computeFlight, Cartesian3ToDegrees, IsPointInPolygon, fliterUavList}
+const getSelectUavList = (platformUav: PlatformUav) => {
+    let uavList: string[] = [];
+    for (let key in platformUav) {
+        uavList = [...uavList, ...platformUav[key]];
+    }
+    return uavList;
+};
+const getUavPointList = (
+    platformUav: PlatformUav,
+    platformPointCol: Cartesian3[]
+) => {
+    let uavPointList: Cartesian3[] = [];
+    let platformIndex: number = 0;
+    for (let key in platformUav) {
+        for (let _ of platformUav[key]) {
+            uavPointList.push(platformPointCol[platformIndex]);
+        }
+        platformIndex += 1;
+    }
+    return uavPointList;
+};
+function feature(type: string, coordinates: any) {
+    return {
+      type: "Feature",
+      properties: {},
+      geometry: {
+        type,
+        coordinates,
+      },
+    };
+  }
+const findDroneInPolygonVoroni = (polygonRegion: number[][], uavPoint: number[][]) => {
+    const polygon = feature('Polygon', [[...polygonRegion, polygonRegion[0]]]);
+
+    const points = 
+        uavPoint.map((item) => {
+            return feature("Point", item);
+        })
+    
+    return irregularVoronoi(polygon, points);
+}
+export { polygonToWKTString, polygonCenter, getUuid, computeFlight, Cartesian3ToDegrees, IsPointInPolygon, fliterUavList, getSelectUavList, getUavPointList, findDroneInPolygonVoroni}

@@ -4,12 +4,12 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-.site-layout .site-layout-background {
+/* .site-layout .site-layout-background {
   background: #fff;
-}
-.content-sider {
+} */
+/* .content-sider {
   background: rgb(248, 248, 248);
-}
+} */
 [data-theme="dark"] .site-layout .site-layout-background {
   background: #141414;
 }

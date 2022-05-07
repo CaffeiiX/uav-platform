@@ -50,7 +50,7 @@ const TaskInfo: React.FC<{
 
       <div style={{ marginTop: "10px", marginBottom: "8px" }}>
         <div style={{ display: "inline-block", width: "160px" }}>
-          <span style={{ color: "blue" }}>无人机状态：</span>
+          <span className="span">无人机状态：</span>
           <Switch disabled={false} checked={isChecked}></Switch>
         </div>
         <Select

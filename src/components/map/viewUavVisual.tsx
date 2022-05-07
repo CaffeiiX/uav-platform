@@ -28,7 +28,7 @@ function computeCirclularFlight(
     const position = Cartesian3.fromDegrees(
       lon + radius * 1.5 * Math.cos(radians),
       lat + radius * Math.sin(radians),
-      CMath.nextRandomNumber() * 500 + 1750
+      100
     );
     property.addSample(time, position);
 
@@ -59,16 +59,17 @@ function computePathFlight(
     const position = Cartesian3.fromDegrees(
       pathPositionCol[i],
       pathPositionCol[i + 1],
-      CMath.nextRandomNumber() * 100 + 300
+      100
     );
     property.addSample(time, position);
     viewer.entities.add({
       position: position,
       point: {
         pixelSize: 8,
-        color: Color.TRANSPARENT,
-        outlineColor: color,
-        outlineWidth: 3,
+        color: color
+        // color: Color.TRANSPARENT,
+        // outlineColor: color,
+        // outlineWidth: 3,
       },
     });
   }
@@ -106,7 +107,7 @@ color: Color}> = ({
       <Entity
         position={positionProperty}
         model={{
-          uri: "./models/CesiumDrone.glb",
+          uri: "./models/Quadcopter.glb",
           minimumPixelSize: 128,
           maximumScale: 20000,
         }}
@@ -125,13 +126,11 @@ color: Color}> = ({
       >
         <PathGraphics
           show={true}
+          resolution={1}
           material={
-            new PolylineGlowMaterialProperty({
-              glowPower: 0.1,
-              color: color,
-            })
+            color
           }
-          width={10}
+          width={2}
         />
       </Entity>
     </>

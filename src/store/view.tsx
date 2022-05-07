@@ -4,6 +4,16 @@ const isSiderShow = atom({
   key: 'siderShow',
   default: true
 });
-
-
-export {isSiderShow}
+const isVisualItemAtom = atom({
+  key: 'isVisualItem',
+  default: false
+});
+const isSiderVisualAtom = atom({
+  key: 'isSiderVisual',
+  default: false
+});
+const isControlSiderVisualAtom = atom({
+  key: 'isControlSiderVisual',
+  default: false
+})
+export {isSiderShow, isVisualItemAtom, isSiderVisualAtom, isControlSiderVisualAtom}

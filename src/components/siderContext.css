@@ -3,7 +3,7 @@
 }
 .sider-header {
   width: 100%;
-  background-color: white;
+  /* background-color: white; */
   flex: 0 0 auto;
   justify-content: flex-start;
   align-items: stretch;

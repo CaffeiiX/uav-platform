@@ -1,8 +1,10 @@
 import axios from "axios";
 import { Cartesian3 } from "cesium";
 import { TaskInfoApiType, TaskInfoType, UavInfoType,UavListInTaskType} from "../interface/taskType";
-import { findDroneInPolygonVoroni, polygonToWKTString } from "../utils/utils";
+import { calculatePolygonVoroniArea, findDroneInPolygonVoroni, polygonToWKTString } from "../utils/utils";
 import qs from 'qs'
+import { useSetRecoilState } from "recoil";
+import { uavPlanPathAreaAtom } from "../store/visual";
 const baseUrl = 'http://192.168.61.91:30094/web/';
 const getTaskInfo = async (num: number, pageSize: number = 3,taskType: number, ) => {
     const response = await axios.get(`${baseUrl}/queryTaskList`, {
@@ -73,9 +75,11 @@ const PostNormalPathAPI =async (polygonRegion: number[][], uavPoint: number[][])
     let points: string = '';
     let drones: string = '';
     const voronoiPolygon = findDroneInPolygonVoroni(polygonRegion, uavPoint);
+    
     const voronoiPolygonRegionList = voronoiPolygon.map((item)=>{
         return item['geometry']['coordinates'];
     })
+    console.log(voronoiPolygonRegionList);
     for(let polygonRegionPoint of polygonRegion){
         points += String(polygonRegionPoint[0]);
         points += ',';
@@ -97,7 +101,7 @@ const PostNormalPathAPI =async (polygonRegion: number[][], uavPoint: number[][])
         "drones": drones,
         'voronoiLines': voronoiPolygonRegionList
     };
-    const response = await axios.post(`http://192.168.31.218:8080/find/multiple`,postData, {
+    const response = await axios.post(`http://192.168.1.108:8080/find/multiple`,postData, {
         headers: {
             'Content-Type':'application/json'
         }

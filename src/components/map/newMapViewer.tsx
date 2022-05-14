@@ -4,7 +4,7 @@ import {
   ScreenSpaceEventHandler,
   defined,
 } from "cesium";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState} from "recoil";
 import {
   Viewer,
@@ -14,7 +14,7 @@ import {
   CesiumMovementEvent,
   Clock,
 } from "resium";
-import { drawPolygonRegionAtom, isDrawPlatformAtom, isDrawTargetPointAtom, isPlatformPointShowAtom, isTargetPointShowAtom, platformPointColAtom, targetPointColAtom, uavPlanPathPointColAtom } from "../../store/map";
+import { cameraLookAtAtom, drawPolygonRegionAtom, isClearMapEntitiesAtom, isDrawPlatformAtom, isDrawTargetPointAtom, isPlatformPointShowAtom, isTargetPointShowAtom, platformPointColAtom, targetPointColAtom, uavPlanPathPointColAtom } from "../../store/map";
 import { osm, osmStyle } from "./mapConfig";
 import useMousePolygon from "../../hook/useMousePolygon";
 // import useUpdatePointCol from "../../hook/useUpdatePointCol";
@@ -25,13 +25,13 @@ import TargetPoints from "./targetPoints";
 import { memo } from "react";
 import { Color } from "cesium";
 import ViewUavVisual from "./viewUavVisual";
+import TaskBoundary from "./taskBoundary";
+import SelectPlanArea from "./selectPlanArea";
 
 const CameraFlyTo = memo(CesiumCameraFlyTo);
 const ColorCol = [new Color(0,153/255,204/255),new Color(255.0/255.0,102/255,102/255), new Color(1,1,204/255), Color.WHITE];
 const NewMapViewer: React.FC<{}> = () => {
-  const [cameraDestination, setCameraDestination] = useState<Cartesian3>(
-    Cartesian3.fromDegrees(114.360734, 30.541093, 5000)
-  );
+  const cameraLookAt = useRecoilValue(cameraLookAtAtom);
   const viewerRef = useRef<CesiumComponentRef<CesiumViewer>>(null);
   const mouseHandlerRef = useRef<ScreenSpaceEventHandler | undefined>(
     undefined
@@ -51,7 +51,7 @@ const NewMapViewer: React.FC<{}> = () => {
   const setIsModalShow = useSetRecoilState(isModalShowAtom);
   //uav plan path
   const uavPlanPathPointCol = useRecoilValue(uavPlanPathPointColAtom);
-
+  // const isClearMapEntities = useRecoilValue(isClearMapEntitiesAtom);
   const onLeftMouseClick = (event: CesiumMovementEvent) => {
     if(!viewerRef.current?.cesiumElement) return;
     const viewer = viewerRef.current.cesiumElement;
@@ -90,6 +90,11 @@ const NewMapViewer: React.FC<{}> = () => {
       setIsDrawTarget(false);
     }
   }
+  // useEffect(()=>{
+  //   if(isClearMapEntities){
+  //     viewerRef.current?.cesiumElement?.entities.removeAll();
+  //   }
+  // },[isClearMapEntities])
   return (
     <>
       <Viewer
@@ -103,7 +108,7 @@ const NewMapViewer: React.FC<{}> = () => {
       >
         <Clock multiplier={1} shouldAnimate={true}/>
         <ImageryLayer imageryProvider={osmStyle}></ImageryLayer>
-        <CameraFlyTo destination={cameraDestination}></CameraFlyTo>
+        <CameraFlyTo destination={cameraLookAt}></CameraFlyTo>
         <PlatformPoint></PlatformPoint>
         <TargetPoints></TargetPoints>
         {
@@ -118,6 +123,8 @@ const NewMapViewer: React.FC<{}> = () => {
           }): (<></>)
         }
         {/* <CameraLookAt target={cameraDestination} offset={{x:20, y : 20,z:10} as any}></CameraLookAt> */}
+      <TaskBoundary/>
+      <SelectPlanArea/>
       </Viewer>
     </>
   );

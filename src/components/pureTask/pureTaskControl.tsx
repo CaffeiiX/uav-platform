@@ -1,12 +1,34 @@
 import { Radio,Button } from "antd"
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { PostFinishTaskAPI } from "../../api/taskAPI";
 import { isModalShowAtom } from "../../store/modal";
-import { ifEndTaskButtonStatus, taskStatusAtom } from "../../store/task";
+import { forceUpdateTaskAtom, ifEndTaskButtonStatus, isUpdateTaskListAtom, querySelectUavListInTask,selectTaskAtom, taskStatusAtom } from "../../store/task";
 import './pureTaskControl.css'
 const PureTaskControl : React.FC<{}> = ({}) => {
   const [taskStatus, setTaskStatus] = useRecoilState(taskStatusAtom);
   const ifEndTaskButton = useRecoilValue(ifEndTaskButtonStatus);
   const setIsModalShow = useSetRecoilState(isModalShowAtom);
+  const [selectTask, setSelectTask] = useRecoilState(selectTaskAtom);
+//   const [IsUpdateTask, setIsUpdateTask] = useRecoilState(isUpdateTaskListAtom);
+  const setForceUpdateTask = useSetRecoilState(forceUpdateTaskAtom);
+  const onEndTaskClick = () => {
+      const status =async () => {
+          await PostFinishTaskAPI(selectTask.Id);
+      };
+      let isEndTask = window.confirm(`是否结束任务：${selectTask.name}`);
+      if(isEndTask){
+          status();
+          setSelectTask({
+            Id: "random",
+            name: "任务名",
+            status: "0",
+            date: "日期",
+            boundary: [],
+          });
+        //   setIsUpdateTask(!IsUpdateTask);
+        setForceUpdateTask(Math.random());
+      };
+  }
   return (
       <>
       <Radio.Group onChange={(e)=>{setTaskStatus(e.target.value)}} value={taskStatus} className="task-control-radio">
@@ -16,7 +38,7 @@ const PureTaskControl : React.FC<{}> = ({}) => {
       <Button className="task-button" disabled={taskStatus === 0 ? false: true} onClick={()=>{setIsModalShow(true);}}>
           创建任务
       </Button>
-      <Button className="task-button" disabled={ifEndTaskButton} onClick={() => {}}>
+      <Button className="task-button" disabled={ifEndTaskButton} onClick={onEndTaskClick}>
           结束任务
       </Button>
       <hr/>

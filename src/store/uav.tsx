@@ -3,7 +3,7 @@ import { PlatformUav } from "../interface/taskType";
 
 //无人机相关部分
 const selectUavIdAtom = atom<string>({
-  key: 'selectTask',
+  key: 'selectUavId',
   default: ''
 });
 const platformSelectUavListAtom = atom<PlatformUav>({

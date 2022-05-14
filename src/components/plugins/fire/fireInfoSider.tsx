@@ -1,10 +1,10 @@
 import { Button } from "antd";
 import Sider from "antd/lib/layout/Sider";
+import { isFireInfoSiderShowAtom } from "../../../store/plugins";
 import { useRecoilState } from "recoil";
-import { isSiderShow } from "../store/view";
-import "./siderContext.css";
-const SiderContent: React.FC<{}> = ({ children }) => {
-  const [visible, setVisible] = useRecoilState(isSiderShow);
+import "./fireInfoSider.css";
+const FireInfoSider: React.FC<{}> = ({ children }) => {
+  const [visible, setVisible] = useRecoilState(isFireInfoSiderShowAtom);
   return (
     <>
       <Sider
@@ -13,14 +13,14 @@ const SiderContent: React.FC<{}> = ({ children }) => {
         collapsed={!visible}
         width={240}
         className="content-sider"
-        zeroWidthTriggerStyle={{visibility: "hidden"}}
+        zeroWidthTriggerStyle={{visibility:"hidden"}}
       >
         {visible ? (
           <>
             <article className="sider-article">
               <header className="sider-header">
                 <div className="header-content">
-                  <h3 className="heading">任务信息</h3>
+                  <h3 className="heading">火灾信息</h3>
                   <Button
                     className="close-button"
                     type="text"
@@ -41,5 +41,4 @@ const SiderContent: React.FC<{}> = ({ children }) => {
     </>
   );
 };
-
-export default SiderContent;
+export default FireInfoSider;

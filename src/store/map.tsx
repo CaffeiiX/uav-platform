@@ -39,5 +39,12 @@ const uavPlanPathPointColAtom = atom<number[][]>({
   key: 'uavPlanPathPointCol',
   default: []
 });
-
-export {isDrawPolygonAtom, drawPolygonRegionAtom, isDrawPlatformAtom, isDrawTargetPointAtom, platformPointColAtom, targetPointColAtom, isTargetPointShowAtom, isPlatformPointShowAtom, uavPlanPathPointColAtom};
+const isClearMapEntitiesAtom = atom<boolean>({
+  key: 'isClearMapEntities',
+  default: false
+})
+const cameraLookAtAtom = atom<Cartesian3>({
+  key: 'camerLookAt',
+  default: Cartesian3.fromDegrees(114.360734, 30.541093, 5000)
+});
+export {isDrawPolygonAtom, drawPolygonRegionAtom, isDrawPlatformAtom, isDrawTargetPointAtom, platformPointColAtom, targetPointColAtom, isTargetPointShowAtom, isPlatformPointShowAtom, uavPlanPathPointColAtom, cameraLookAtAtom, isClearMapEntitiesAtom};

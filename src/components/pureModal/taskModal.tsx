@@ -2,17 +2,19 @@ import { Modal, Input, Button, Radio, Select } from "antd";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { getTaskUavList, postCreateTask, PostNormalPathAPI, PostPathPlanDataAPI } from "../../api/taskAPI";
-import { drawPolygonRegionAtom, isDrawPolygonAtom, platformPointColAtom, targetPointColAtom, uavPlanPathPointColAtom } from "../../store/map";
+import { drawPolygonRegionAtom, isClearMapEntitiesAtom, isDrawPolygonAtom, platformPointColAtom, targetPointColAtom, uavPlanPathPointColAtom } from "../../store/map";
 import { isModalShowAtom } from "../../store/modal";
+import { forceUpdateTaskAtom, planPathMethodAtom, taskStatusAtom } from "../../store/task";
 import { platformSelectUavListAtom, uavListAtom } from "../../store/uav";
 import { isVisualItemAtom } from "../../store/view";
-import { Cartesian3ToDegrees, getSelectUavList, getUavPointList } from "../../utils/utils";
+import { uavPlanPathAreaAtom, uavPlanPathBoundaryAtom } from "../../store/visual";
+import { calculatePolygonVoroniArea, Cartesian3ToDegrees, getSelectUavList, getUavPointList } from "../../utils/utils";
 import MethodModal from "./methodModal";
 const { Option } = Select;
 const TaskModal: React.FC<{}> = ({}) => {
   const [taskName, setTaskName] = useState("");
   const [areaMode, setAreaMode] = useState(0);
-  const [methodMode, setMethodMode] = useState("");
+  const [methodMode, setMethodMode] = useRecoilState(planPathMethodAtom);
   const [isModalShow, setIsModalShow] = useRecoilState(isModalShowAtom);
   const setUavList = useSetRecoilState(uavListAtom);
   const polygonRegion = useRecoilValue(drawPolygonRegionAtom);
@@ -21,6 +23,12 @@ const TaskModal: React.FC<{}> = ({}) => {
   const setUavPlanPathPointCol = useSetRecoilState(uavPlanPathPointColAtom);
   const targetPointCol = useRecoilValue(targetPointColAtom);
   const setIsVisualItem = useSetRecoilState(isVisualItemAtom);
+  const taskStatus = useRecoilValue(taskStatusAtom);
+  const setUavPlanPathArea = useSetRecoilState(uavPlanPathAreaAtom);
+  const setUavPlanPathBoundary = useSetRecoilState(uavPlanPathBoundaryAtom);
+  // const [isUpdateTask, setIsUpdateTask] = useRecoilState(isUpdateTaskListAtom);
+  const setForceUpdateTask = useSetRecoilState(forceUpdateTaskAtom);
+  const setIsClearMapEntities = useSetRecoilState(isClearMapEntitiesAtom);
   useEffect(() => {
     const fetchData = async () => {
       const data = await getTaskUavList();
@@ -32,6 +40,7 @@ const TaskModal: React.FC<{}> = ({}) => {
   const setIsDrawPolygon = useSetRecoilState(isDrawPolygonAtom);
   const onButtonOk = async () => {
     const selectUavList = getSelectUavList(platformSelectUavList);
+    // setIsClearMapEntities(false);
     if (taskName === "") {
       alert("请选择无人机方案");
       return;
@@ -50,22 +59,31 @@ const TaskModal: React.FC<{}> = ({}) => {
         task_name: taskName,
         droneIds: selectUavList,
         task_bounary: polygonRegion,
-        task_status: "1",
-        task_type: "1",
+        task_status: '1',
+        task_type: String(taskStatus),
       });
-      console.log(status);
+      // setIsUpdateTask(!isUpdateTask)
+      setForceUpdateTask(Math.random());
+      if(status === 'success'){
+        alert('无人机任务创建成功');
+      }
       return;
     }
     if(methodMode === '2' || methodMode === '3'){
-      const polygonRegionDegreesList = polygonRegion.map((item) => Cartesian3ToDegrees(item));
+        const polygonRegionDegreesList = polygonRegion.map((item) => Cartesian3ToDegrees(item));
         const uavPointList = getUavPointList(platformSelectUavList, platformPointCol).map(item => Cartesian3ToDegrees(item));
-        console.log(uavPointList);
+        
         const responseNormal = await PostNormalPathAPI(
           polygonRegionDegreesList,
-          uavPointList
+          uavPointList,
         );
         setUavPlanPathPointCol(responseNormal);
         setIsVisualItem(true);
+        const [uavArea, uavBoundary] = calculatePolygonVoroniArea(polygonRegionDegreesList, uavPointList, selectUavList);
+        console.log(uavArea);
+        console.log(uavBoundary);
+        setUavPlanPathArea(uavArea);
+        setUavPlanPathBoundary(uavBoundary);
         return;
     }
     if(methodMode === '4'){

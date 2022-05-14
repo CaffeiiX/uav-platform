@@ -1,19 +1,20 @@
 import { Table } from "antd";
 import { useRecoilState, useRecoilValueLoadable, useSetRecoilState } from "recoil";
 import { columns} from "../../mock/taskListData";
-import { queryCurrentTaskList, selectTaskAtom, taskPageNumAtom} from "../../store/task";
+import { forceUpdateTaskAtom, queryCurrentTaskList, selectTaskAtom, taskPageNumAtom} from "../../store/task";
 import './pureTaskList.css'
 
 const PureTaskList : React.FC<{}> = ({}) => {
     const setPageNum = useSetRecoilState(taskPageNumAtom);
     const taskListAble = useRecoilValueLoadable(queryCurrentTaskList);
     const [selectTask, setSelectTask] = useRecoilState(selectTaskAtom);
+    const setForceUdpateTask = useSetRecoilState(forceUpdateTaskAtom);
     switch(taskListAble.state){
         case 'hasValue':
             return (
                 <>
                 <Table className="table-task-list" size="small" dataSource={taskListAble.contents} columns={columns}
-                       pagination={{pageSize: 3, total: 20, onChange: (e)=>{setPageNum(e)}}} 
+                       pagination={{pageSize: 3, total: 20, onChange: (e)=>{setPageNum(e);setForceUdpateTask(Math.random());}}} 
                        onRow={record => {
                            return {
                                onClick: event => {},

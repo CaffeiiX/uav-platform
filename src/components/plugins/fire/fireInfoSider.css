@@ -9,8 +9,7 @@
   align-items: stretch;
   border-bottom-width: 0.5px;
   border-bottom-style: solid;
-  padding: 0.875rem 0.75rem;
-  background-color: rgb(33, 33, 33);
+  padding: 0.875rem 0.75rem
 }
 .header-content {
   display: flex;

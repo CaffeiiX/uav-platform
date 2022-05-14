@@ -15,10 +15,13 @@ import { isControlSiderVisualAtom, isSiderShow, isSiderVisualAtom, isVisualItemA
 import PureTask from "./pureTask/pureTask";
 import TaskModal from "./pureModal/taskModal";
 import { memo } from "react";
-import VisualItem from "./visual/visualSider";
+// import VisualItem from "./visual/visualSider";
 import VisualSider from "./visual/visualSider";
-import VisualChart from "./visual/visualChart";
+// import VisualChart from "./visual/visualChart";
 import ControlSider from "./pureControl/controlSider";
+import PluginsSider from "./plugins/pluginsSider";
+import { isShowPluginSiderSelector } from "../store/plugins";
+import FireInfoSider from "./plugins/fire/fireInfoSider";
 const { SubMenu } = Menu;
 const {Content, Sider } = Layout;
 const MapViewer = memo(NewMapViewer);
@@ -29,6 +32,7 @@ const NewMainView: React.FC<{}> = () => {
   const [visualVisible, setVisualVisible] = useRecoilState(isSiderVisualAtom);
   const [controlVisible, setControlVisible] = useRecoilState(isControlSiderVisualAtom);
   const isVisualItem = useRecoilValue(isVisualItemAtom);
+  const isShowPluginSider = useRecoilValue(isShowPluginSiderSelector);
   const onCollapse = () => {
     setCollapse(!collapsed);
   };
@@ -72,17 +76,23 @@ const NewMainView: React.FC<{}> = () => {
         <SiderContent>
           <PureTask></PureTask>
         </SiderContent>
-        <VisualSider>
+        <VisualSider/>
           {/* <VisualChart isShowChart={visualVisible}></VisualChart> */}
-        </VisualSider>
-        <ControlSider>
-          
-        </ControlSider>
+        <ControlSider/>
+        
         <Layout className="site-layout">
           <Content style={{ margin: '0' }}>
             <MapViewer></MapViewer>
           </Content>
         </Layout>
+        {/* <FireInfoSider/> */}
+        {
+          isShowPluginSider? <FireInfoSider/> : <></>
+        }
+        {
+          isShowPluginSider? <PluginsSider/> : <></>
+        }
+
         <TaskModal/>
       </Layout>
   );

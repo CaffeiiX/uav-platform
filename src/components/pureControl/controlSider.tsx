@@ -1,8 +1,10 @@
-import { Button } from "antd";
+import { Button, Checkbox, Menu } from "antd";
 import Sider from "antd/lib/layout/Sider";
 import {isControlSiderVisualAtom} from "../../store/view";
 import { useRecoilState } from "recoil";
 import "./controlSider.css";
+import { center } from "@turf/turf";
+import FireControl from "./fireControl";
 const ControlSider: React.FC<{}> = ({ children }) => {
   const [visible, setVisible] = useRecoilState(isControlSiderVisualAtom);
   return (
@@ -13,6 +15,7 @@ const ControlSider: React.FC<{}> = ({ children }) => {
         collapsed={!visible}
         width={240}
         className="content-sider"
+        zeroWidthTriggerStyle={{visibility:"hidden"}}
       >
         {visible ? (
           <>
@@ -30,6 +33,17 @@ const ControlSider: React.FC<{}> = ({ children }) => {
                 </div>
               </header>
             </article>
+            <div>
+            <Menu mode="inline">
+                <Menu.Item style={{textAlign: 'center'}}>插件集合</Menu.Item>
+                <Menu.SubMenu title='基础组件'>
+                  <Checkbox disabled={true} checked={true} style={{marginTop:'10px', marginLeft: '10px', marginBottom: '10px'}}>任务信息</Checkbox>
+                </Menu.SubMenu>
+                <Menu.SubMenu title='火灾组件'>
+                <FireControl/>
+                </Menu.SubMenu>
+              </Menu>
+            </div>
           </>
         ) : (
           <></>

@@ -1,9 +1,0 @@
-.TabPlane {
-    position: absolute;
-    width: 300px;
-    right: 1%;
-    bottom: 5%;
-    top: 5%;
-    z-index: 1000;
-    background-color: white;
-}

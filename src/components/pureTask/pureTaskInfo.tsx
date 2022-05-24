@@ -13,14 +13,14 @@ const PureTaskInfo: React.FC<{}> = () => {
       return (
         <>
         <TaskInfo selectTask={selectTask} selectUavListInTask={selectUavListInTaskAble.contents}></TaskInfo>
-        <UavInfo isChecked={false} selectUavListInTask={selectUavListInTaskAble.contents.map(item => item.droneId)}></UavInfo>
+        <UavInfo selectUavListInTask={selectUavListInTaskAble.contents.map(item => item.droneId)}></UavInfo>
         </>
       );
     case 'loading':
       return (
         <>
         <TaskInfo selectTask={selectTask} selectUavListInTask={[]}></TaskInfo>
-        <UavInfo isChecked={false} selectUavListInTask={[]}></UavInfo>
+        <UavInfo  selectUavListInTask={[]}></UavInfo>
         </>
       );
     case 'hasError':

@@ -13,20 +13,23 @@ import {
   CesiumComponentRef,
   CesiumMovementEvent,
   Clock,
+  Entity
 } from "resium";
-import { cameraLookAtAtom, drawPolygonRegionAtom, isClearMapEntitiesAtom, isDrawPlatformAtom, isDrawTargetPointAtom, isPlatformPointShowAtom, isTargetPointShowAtom, platformPointColAtom, targetPointColAtom, uavPlanPathPointColAtom } from "../../store/map";
+import { cameraLookAtAtom, drawPolygonRegionAtom, isClearMapEntitiesAtom, isDrawCreateTaskRegionAtom, isDrawPlatformAtom, isDrawTargetPointAtom, isPlatformPointShowAtom, isTargetPointShowAtom, platformPointColAtom, targetPointColAtom, uavPlanPathPointColAtom } from "../../store/map";
 import { osm, osmStyle } from "./mapConfig";
 import useMousePolygon from "../../hook/useMousePolygon";
 // import useUpdatePointCol from "../../hook/useUpdatePointCol";
 import { IsPointInPolygon } from "../../utils/utils";
 import PlatformPoint from "./platformPoints";
-import { isModalShowAtom } from "../../store/modal";
+import { isModalShowAtom, isShowCreateTaskModalAtom } from "../../store/modal";
 import TargetPoints from "./targetPoints";
 import { memo } from "react";
 import { Color } from "cesium";
 import ViewUavVisual from "./viewUavVisual";
 import TaskBoundary from "./taskBoundary";
 import SelectPlanArea from "./selectPlanArea";
+import UavInTimePath from "./uavInTimePath";
+import { selectUavIdAtom } from "../../store/uav";
 
 const CameraFlyTo = memo(CesiumCameraFlyTo);
 const ColorCol = [new Color(0,153/255,204/255),new Color(255.0/255.0,102/255,102/255), new Color(1,1,204/255), Color.WHITE];
@@ -51,6 +54,10 @@ const NewMapViewer: React.FC<{}> = () => {
   const setIsModalShow = useSetRecoilState(isModalShowAtom);
   //uav plan path
   const uavPlanPathPointCol = useRecoilValue(uavPlanPathPointColAtom);
+  // create Task
+  const setIsCreateTaskModalShow = useSetRecoilState(isShowCreateTaskModalAtom);
+  const isDrawCreateTaskRegion = useRecoilValue(isDrawCreateTaskRegionAtom);
+  const selectUavId = useRecoilValue(selectUavIdAtom);
   // const isClearMapEntities = useRecoilValue(isClearMapEntitiesAtom);
   const onLeftMouseClick = (event: CesiumMovementEvent) => {
     if(!viewerRef.current?.cesiumElement) return;
@@ -122,7 +129,10 @@ const NewMapViewer: React.FC<{}> = () => {
             )
           }): (<></>)
         }
-        {/* <CameraLookAt target={cameraDestination} offset={{x:20, y : 20,z:10} as any}></CameraLookAt> */}
+        {
+          selectUavId === '' ? <></> : <UavInTimePath/>
+        }
+    {/* <UavInTimePath/> */}
       <TaskBoundary/>
       <SelectPlanArea/>
       </Viewer>

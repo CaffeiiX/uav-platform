@@ -2,13 +2,17 @@ import { Table } from "antd";
 import { useRecoilState, useRecoilValueLoadable, useSetRecoilState } from "recoil";
 import { columns} from "../../mock/taskListData";
 import { forceUpdateTaskAtom, queryCurrentTaskList, selectTaskAtom, taskPageNumAtom} from "../../store/task";
+import { selectUavIdAtom} from "../../store/uav";
+// import { uavInTimePathDictAtom } from "../../store/uav";
 import './pureTaskList.css'
 
 const PureTaskList : React.FC<{}> = ({}) => {
     const setPageNum = useSetRecoilState(taskPageNumAtom);
     const taskListAble = useRecoilValueLoadable(queryCurrentTaskList);
     const [selectTask, setSelectTask] = useRecoilState(selectTaskAtom);
+    const setSelectUavId = useSetRecoilState(selectUavIdAtom)
     const setForceUdpateTask = useSetRecoilState(forceUpdateTaskAtom);
+
     switch(taskListAble.state){
         case 'hasValue':
             return (
@@ -18,7 +22,7 @@ const PureTaskList : React.FC<{}> = ({}) => {
                        onRow={record => {
                            return {
                                onClick: event => {},
-                               onDoubleClick: event => {setSelectTask(record)},
+                               onDoubleClick: event => {setSelectTask(record); setSelectUavId('')},
                                onMouseEnter: event => {event.stopPropagation()}
                            }
                        }}

@@ -1,5 +1,5 @@
 import { Layout, Menu} from "antd";
-import { useState } from "react";
+import { Children, useState } from "react";
 import {
   ProfileFilled,
   PieChartFilled,
@@ -22,6 +22,10 @@ import ControlSider from "./pureControl/controlSider";
 import PluginsSider from "./plugins/pluginsSider";
 import { isShowPluginSiderSelector } from "../store/plugins";
 import FireInfoSider from "./plugins/fire/fireInfoSider";
+import WebsocketInfo from "./common/websocketInfo";
+import DynamicTaskModal from "./pureModal/dynamicTaskModal";
+import CreateTaskModal from "./pureModal/createTaskModal";
+import RelateTaskModal from "./pureModal/relateTaskModal";
 const { SubMenu } = Menu;
 const {Content, Sider } = Layout;
 const MapViewer = memo(NewMapViewer);
@@ -33,6 +37,7 @@ const NewMainView: React.FC<{}> = () => {
   const [controlVisible, setControlVisible] = useRecoilState(isControlSiderVisualAtom);
   const isVisualItem = useRecoilValue(isVisualItemAtom);
   const isShowPluginSider = useRecoilValue(isShowPluginSiderSelector);
+  // const isShowDynamicTaskCreateModal = useRecoilValue(isShowDynamicTaskCreateModalSelector);
   const onCollapse = () => {
     setCollapse(!collapsed);
   };
@@ -75,6 +80,7 @@ const NewMainView: React.FC<{}> = () => {
         </Sider>
         <SiderContent>
           <PureTask></PureTask>
+          <WebsocketInfo/>
         </SiderContent>
         <VisualSider/>
           {/* <VisualChart isShowChart={visualVisible}></VisualChart> */}
@@ -82,7 +88,7 @@ const NewMainView: React.FC<{}> = () => {
         
         <Layout className="site-layout">
           <Content style={{ margin: '0' }}>
-            <MapViewer></MapViewer>
+            <MapViewer/>
           </Content>
         </Layout>
         {/* <FireInfoSider/> */}
@@ -92,8 +98,10 @@ const NewMainView: React.FC<{}> = () => {
         {
           isShowPluginSider? <PluginsSider/> : <></>
         }
-
         <TaskModal/>
+        <DynamicTaskModal/>
+        <CreateTaskModal/>
+        <RelateTaskModal/>
       </Layout>
   );
 };

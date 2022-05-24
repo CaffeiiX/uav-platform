@@ -1,19 +1,23 @@
 import { Radio,Button } from "antd"
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { PostFinishTaskAPI } from "../../api/taskAPI";
+import { getInUseUavListAPI, PostFinishTaskAPI } from "../../api/taskAPI";
 import { isModalShowAtom } from "../../store/modal";
-import { forceUpdateTaskAtom, ifEndTaskButtonStatus, isUpdateTaskListAtom, querySelectUavListInTask,selectTaskAtom, taskStatusAtom } from "../../store/task";
+import { forceUpdateTaskAtom, ifEndTaskButtonStatus, selectTaskAtom, taskStatusAtom } from "../../store/task";
+import { inUseUavListAtom } from "../../store/uav";
 import './pureTaskControl.css'
 const PureTaskControl : React.FC<{}> = ({}) => {
   const [taskStatus, setTaskStatus] = useRecoilState(taskStatusAtom);
   const ifEndTaskButton = useRecoilValue(ifEndTaskButtonStatus);
   const setIsModalShow = useSetRecoilState(isModalShowAtom);
   const [selectTask, setSelectTask] = useRecoilState(selectTaskAtom);
+  const setInUseUavList = useSetRecoilState(inUseUavListAtom);
 //   const [IsUpdateTask, setIsUpdateTask] = useRecoilState(isUpdateTaskListAtom);
   const setForceUpdateTask = useSetRecoilState(forceUpdateTaskAtom);
   const onEndTaskClick = () => {
       const status =async () => {
           await PostFinishTaskAPI(selectTask.Id);
+          const data = await getInUseUavListAPI();
+          setInUseUavList(data.map(item => item.droneName));
       };
       let isEndTask = window.confirm(`是否结束任务：${selectTask.name}`);
       if(isEndTask){

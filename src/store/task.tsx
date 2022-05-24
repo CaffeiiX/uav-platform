@@ -30,11 +30,19 @@ const queryCurrentTaskList = selector({
     get(forceUpdateTaskAtom);
     const status = get(taskStatusAtom);
     const pageNum = get(taskPageNumAtom);
-    console.log(pageNum);
     const taskData = await getTaskInfo(pageNum, 3, status);
     return taskData;
   },
 });
+const queryAllDynamicTaskListSelector = selector({
+  key: 'queryAllDynamicTaskList',
+  get:async ({get}) => {
+    get(forceUpdateTaskAtom);
+    const status = get(taskStatusAtom);
+    const taskData = await getTaskInfo(1, -1, status);
+    return taskData.filter(item => item.status ==='进行中');
+  }
+})
 // 选择的任务
 const selectTaskAtom = atom<TaskInfoType>({
   key: "selectTask",
@@ -58,7 +66,7 @@ const isDrawSelectTaskBoundarySelector = selector({
 });
 // 任务对应的无人机Id列表
 const querySelectUavListInTask = selector({
-  key: "selectUavList",
+  key: "selectUavListInTask",
   get: async ({ get }) => {
     const selectTask = get(selectTaskAtom);
     if (selectTask) {
@@ -84,7 +92,17 @@ const ifEndTaskButtonStatus = selector({
 const planPathMethodAtom = atom({
   key: 'planPathMehtod',
   default: ""
-})
+});
+//判断无人机是否在任务中
+const isUavFlyInTaskAtom = atom({
+  key: 'isUavFlyInTask',
+  default: false
+});
+const uavFlyInTaskListAtom = atom({
+  key: 'uavFlyInTaskListAtom',
+  default: []
+});
+
 // const selectUavList = selector({
 //   key: 'uavList',
 //   get: ({get}) => {
@@ -102,5 +120,8 @@ export {
   isDrawSelectTaskBoundarySelector,
   isUpdateTaskListAtom,
   forceUpdateTaskAtom,
-  planPathMethodAtom
+  planPathMethodAtom,
+  isUavFlyInTaskAtom,
+  uavFlyInTaskListAtom,
+  queryAllDynamicTaskListSelector
 };

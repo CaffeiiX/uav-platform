@@ -94,6 +94,12 @@ type UavListInTaskType = {
   droneName: string,
   droneStatus: string
 }
+type InUseUavListType = {
+  droneId: string,
+  droneName: string,
+  droneStatus: number,
+  registrationDate: string | null
+}
 export type {
   TaskInfoType,
   TaskInfoApiType,
@@ -105,5 +111,6 @@ export type {
   TargetPointColType,
   IsDrawPointType,
   PlatformUav,
-  UavListInTaskType
+  UavListInTaskType,
+  InUseUavListType
 };

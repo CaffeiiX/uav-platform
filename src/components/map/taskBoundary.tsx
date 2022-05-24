@@ -15,7 +15,7 @@ const TaskBoundary: React.FC<{}> = () => {
     isDrawSelectTaskBoundarySelector
   );
   useEffect(()=> {
-    cesiumRef.viewer?.entities.removeAll();
+    // cesiumRef.viewer?.entities.removeAll();
   }, [])
   useEffect(() => {
     if (selectTask.boundary.length > 0) {

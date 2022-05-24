@@ -1,11 +1,11 @@
 import { Modal, Input, Button, Radio, Select } from "antd";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { getTaskUavList, postCreateTask, PostNormalPathAPI, PostPathPlanDataAPI } from "../../api/taskAPI";
+import { getTaskUavList, postCreateTask, PostNormalPathAPI, PostPathPlanDataAPI, getInUseUavListAPI} from "../../api/taskAPI";
 import { drawPolygonRegionAtom, isClearMapEntitiesAtom, isDrawPolygonAtom, platformPointColAtom, targetPointColAtom, uavPlanPathPointColAtom } from "../../store/map";
 import { isModalShowAtom } from "../../store/modal";
 import { forceUpdateTaskAtom, planPathMethodAtom, taskStatusAtom } from "../../store/task";
-import { platformSelectUavListAtom, uavListAtom } from "../../store/uav";
+import { platformSelectUavListAtom, uavListAtom, inUseUavListAtom} from "../../store/uav";
 import { isVisualItemAtom } from "../../store/view";
 import { uavPlanPathAreaAtom, uavPlanPathBoundaryAtom } from "../../store/visual";
 import { calculatePolygonVoroniArea, Cartesian3ToDegrees, getSelectUavList, getUavPointList } from "../../utils/utils";
@@ -17,6 +17,7 @@ const TaskModal: React.FC<{}> = ({}) => {
   const [methodMode, setMethodMode] = useRecoilState(planPathMethodAtom);
   const [isModalShow, setIsModalShow] = useRecoilState(isModalShowAtom);
   const setUavList = useSetRecoilState(uavListAtom);
+  const setInUseUavList = useSetRecoilState(inUseUavListAtom);
   const polygonRegion = useRecoilValue(drawPolygonRegionAtom);
   const platformSelectUavList = useRecoilValue(platformSelectUavListAtom);
   const platformPointCol = useRecoilValue(platformPointColAtom);
@@ -28,11 +29,13 @@ const TaskModal: React.FC<{}> = ({}) => {
   const setUavPlanPathBoundary = useSetRecoilState(uavPlanPathBoundaryAtom);
   // const [isUpdateTask, setIsUpdateTask] = useRecoilState(isUpdateTaskListAtom);
   const setForceUpdateTask = useSetRecoilState(forceUpdateTaskAtom);
-  const setIsClearMapEntities = useSetRecoilState(isClearMapEntitiesAtom);
+  // const setIsClearMapEntities = useSetRecoilState(isClearMapEntitiesAtom);
   useEffect(() => {
     const fetchData = async () => {
       const data = await getTaskUavList();
       setUavList(data.map((item) => item.droneId));
+      const data2 = await getInUseUavListAPI();
+      setInUseUavList(data2.map(item => item.droneId));
     };
     fetchData();
   }, []);

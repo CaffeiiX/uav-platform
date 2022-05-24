@@ -34,7 +34,10 @@ const isPlatformPointShowAtom = atom<boolean>({
   key: 'isPlatformShow',
   default: false
 });
-
+const isDrawCreateTaskRegionAtom = atom<boolean>({
+  key: 'isDrawCreateTaskRegion',
+  default: false
+})
 const uavPlanPathPointColAtom = atom<number[][]>({
   key: 'uavPlanPathPointCol',
   default: []
@@ -47,4 +50,4 @@ const cameraLookAtAtom = atom<Cartesian3>({
   key: 'camerLookAt',
   default: Cartesian3.fromDegrees(114.360734, 30.541093, 5000)
 });
-export {isDrawPolygonAtom, drawPolygonRegionAtom, isDrawPlatformAtom, isDrawTargetPointAtom, platformPointColAtom, targetPointColAtom, isTargetPointShowAtom, isPlatformPointShowAtom, uavPlanPathPointColAtom, cameraLookAtAtom, isClearMapEntitiesAtom};
+export {isDrawPolygonAtom, drawPolygonRegionAtom, isDrawPlatformAtom, isDrawTargetPointAtom, platformPointColAtom, targetPointColAtom, isTargetPointShowAtom, isPlatformPointShowAtom, uavPlanPathPointColAtom, cameraLookAtAtom, isClearMapEntitiesAtom, isDrawCreateTaskRegionAtom};

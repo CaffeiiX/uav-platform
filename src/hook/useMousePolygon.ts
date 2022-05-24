@@ -11,7 +11,7 @@ import { useSetRecoilState, useRecoilValue } from "recoil";
 // import Entity from "cesium/Source/DataSources/Entity";
 import { CesiumMovementEvent } from "resium";
 import { drawPolygonRegionAtom, isDrawPolygonAtom } from "../store/map";
-import { isModalShowAtom } from "../store/modal";
+import { isCreateTaskModalAtom, isModalShowAtom, isShowCreateTaskModalAtom } from "../store/modal";
 // import { ScreenSpaceEventHandler } from "resium";
 
 const createPointEntity = (viewer: CesiumViewer, worldPosition:
@@ -181,11 +181,18 @@ const useMousePolygon = (viewer: CesiumViewer | undefined, mouseHandler: any) =>
   const setIsShowModal = useSetRecoilState(isModalShowAtom);
   const setIsDrawPolygon = useSetRecoilState(isDrawPolygonAtom);
   const setPolygonRegion = useSetRecoilState(drawPolygonRegionAtom);
+  const isCreateTaskModal = useRecoilValue(isCreateTaskModalAtom);
+  const setIsShowCreateTaskModal = useSetRecoilState(isShowCreateTaskModalAtom);
   useEffect(() => {
     if (isDrawPolygon && viewer) {
       viewer.entities.removeAll();
-      const a = CesiumViewMouseEvent(viewer, mouseHandler, setIsDrawPolygon, setIsShowModal, setPolygonRegion);
-      a();
+      if(isCreateTaskModal){
+        const a = CesiumViewMouseEvent(viewer, mouseHandler, setIsDrawPolygon, setIsShowCreateTaskModal, setPolygonRegion);
+        a();
+      } else {
+        const a = CesiumViewMouseEvent(viewer, mouseHandler, setIsDrawPolygon, setIsShowModal, setPolygonRegion);
+        a();
+      }
     } else {
       if (mouseHandler.current) {
         mouseHandler.current.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);

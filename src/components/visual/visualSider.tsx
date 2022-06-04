@@ -1,13 +1,15 @@
 import { Button } from "antd";
 import Sider from "antd/lib/layout/Sider";
 import { isSiderVisualAtom } from "../../store/view";
-import { useRecoilState } from "recoil";
+import { useRecoilState,  useSetRecoilState } from "recoil";
 import "./visualSider.css";
 import PieChart from "./pieChartVisual";
 import UavAreaText from "./uavAreaText";
 import EndPlanPath from './endPlanPath';
+import { isClearMapEntitiesAtom } from "../../store/map";
 const VisualSider: React.FC<{}> = ({ children }) => {
   const [visible, setVisible] = useRecoilState(isSiderVisualAtom);
+  const setIsClearMap = useSetRecoilState(isClearMapEntitiesAtom);
   return (
     <>
       <Sider
@@ -27,11 +29,11 @@ const VisualSider: React.FC<{}> = ({ children }) => {
                   <Button
                     className="close-button"
                     type="text"
-                    onClick={() => setVisible(false)}
+                    onClick={() => {setVisible(false);setIsClearMap(true);}}
                   >
                     X
                   </Button>
-                </div>
+                </div>s
                 <PieChart/>
                 <hr/>
                 <div>

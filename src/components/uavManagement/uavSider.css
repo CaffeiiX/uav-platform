@@ -20,19 +20,6 @@
   align-items: flex-end;
 }
 
-.task-simalgo-select {
-  width: 80%;
-  align-self: center;
-  margin-left: 10%;
-  margin-top: 10px;
-}
-
-.task-detalgo-select {
-  width: 80%;
-  align-self: center;
-  margin-left: 10%;
-}
-
 /* .content-sider {
   position: absolute;
   margin-left: 150px;

@@ -31,4 +31,9 @@ const isFireInfoSiderShowAtom = atom({
   key: 'isFireInfoSiderShow',
   default: false
 })
-export {firePluginsMapAtom, isShowPluginSiderSelector, isFireInfoSiderShowAtom}
+
+const isFireSimulationShowAtom=atom({
+  key:'isFireSimulationShow',
+  default: false
+})
+export {firePluginsMapAtom, isShowPluginSiderSelector, isFireInfoSiderShowAtom,isFireSimulationShowAtom}

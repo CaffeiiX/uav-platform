@@ -2,14 +2,12 @@ import { Cartesian3, JulianDate, PolylineGlowMaterialProperty, SampledPositionPr
 import Color from "cesium/Source/Core/Color";
 import ExtrapolationType from "cesium/Source/Core/ExtrapolationType";
 import LinearApproximation from "cesium/Source/Core/LinearApproximation";
-import { time } from "console";
 import { useEffect, useRef } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue} from "recoil";
 import { Entity, useCesium,PathGraphics} from "resium";
-import { cameraLookAtAtom } from "../../store/map";
-import { selectUavIdAtom, uavInTimePathDictAtom, uavWebsocketJsonMessageSelector, uavWebsocketMessageAtom} from "../../store/uav";
+import { selectUavIdAtom, uavInTimePathDictAtom, uavWebsocketJsonMessageSelector} from "../../store/uav";
 
-const UavInTimePath: React.FC<{}> = () => {
+const UavInTimePath: React.FC<{isTrack: boolean}> = ({isTrack}) => {
   // const uavWebscoketMessage = useRecoilValue(uavWebsocketMessageAtom);
   const uavPathProperty = useRef<SampledPositionProperty>(
     new SampledPositionProperty()
@@ -77,7 +75,7 @@ const UavInTimePath: React.FC<{}> = () => {
     }}
     show={true}
     viewFrom={new Cartesian3(-2080, -1715, 2000) as any}
-    tracked={true}
+    tracked={isTrack}
     >
       <PathGraphics
       show={true}

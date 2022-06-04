@@ -100,6 +100,17 @@ type InUseUavListType = {
   droneStatus: number,
   registrationDate: string | null
 }
+
+type FireTaskInfoType={
+  Id:string,
+  taskName:string,
+  uavId:number,
+  fireLocalTime:string,
+  fireTime:string,
+  currFire:number[],
+  nextFire:number[],
+  fireEntiId:string
+}
 export type {
   TaskInfoType,
   TaskInfoApiType,
@@ -112,5 +123,6 @@ export type {
   IsDrawPointType,
   PlatformUav,
   UavListInTaskType,
-  InUseUavListType
+  InUseUavListType,
+  FireTaskInfoType
 };

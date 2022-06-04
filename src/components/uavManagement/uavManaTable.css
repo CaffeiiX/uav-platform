@@ -1,0 +1,18 @@
+.uav-button {
+    width: 230px;
+    margin-top: 8px;
+    font-size: 13px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.editable-row .ant-form-item-explain {
+position: absolute;
+top: 100%;
+font-size: 12px;
+}
+
+.table-task-row {
+    background-color: rgba(25, 110, 238, 0.5) !important;
+  }

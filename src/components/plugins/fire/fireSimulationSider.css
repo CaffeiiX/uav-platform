@@ -1,0 +1,29 @@
+.sider-article {
+    display: flex;
+  }
+  .sider-header {
+    width: 100%;
+    /* background-color: white; */
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    align-items: stretch;
+    border-bottom-width: 0.5px;
+    border-bottom-style: solid;
+    padding: 0.875rem 0.75rem
+  }
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+  }
+  .close-button {
+    justify-content: end;
+    align-items: flex-end;
+  }
+  .simulation-button {
+    width: 95px;
+    margin-top: 8px;
+    font-size: 13px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }

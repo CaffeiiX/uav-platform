@@ -11,41 +11,17 @@ import {
   TimeInterval,
 } from "cesium";
 import Viewer from "cesium/Source/Widgets/Viewer/Viewer";
-import { useEffect, useState } from "react";
-import { Entity, useCesium, PathGraphics } from "resium";
+import React, { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { Entity, useCesium, PathGraphics, PointGraphics } from "resium";
+import { uavPlanPathPointColAtom } from "../../store/map";
 
-function computeCirclularFlight(
-  start: JulianDate,
-  lon: number,
-  lat: number,
-  radius: number,
-  viewer: Viewer
-) {
-  const property = new SampledPositionProperty();
-  for (let i = 0; i <= 360; i += 45) {
-    const radians = CMath.toRadians(i);
-    const time = JulianDate.addSeconds(start, i, new JulianDate());
-    const position = Cartesian3.fromDegrees(
-      lon + radius * 1.5 * Math.cos(radians),
-      lat + radius * Math.sin(radians),
-      100
-    );
-    property.addSample(time, position);
-
-    //Also create a point for each sample we generate.
-    viewer.entities.add({
-      position: position,
-      point: {
-        pixelSize: 8,
-        color: Color.TRANSPARENT,
-        outlineColor: Color.YELLOW,
-        outlineWidth: 3,
-      },
-    });
-  }
-  return property;
-}
-
+const ColorCol = [
+  new Color(0, 153 / 255, 204 / 255),
+  new Color(255.0 / 255.0, 102 / 255, 102 / 255),
+  new Color(1, 1, 204 / 255),
+  Color.WHITE,
+];
 function computePathFlight(
   start: JulianDate,
   pathPositionCol: number[],
@@ -66,7 +42,7 @@ function computePathFlight(
       position: position,
       point: {
         pixelSize: 8,
-        color: color
+        color: color,
         // color: Color.TRANSPARENT,
         // outlineColor: color,
         // outlineWidth: 3,
@@ -76,9 +52,9 @@ function computePathFlight(
   return property;
 }
 
-const ViewUavVisual: React.FC<{ pathPositionCol: number[],
-color: Color}> = ({
-  pathPositionCol, color
+const ViewUavVisual: React.FC<{ pathPositionCol: number[]; color: Color }> = ({
+  pathPositionCol,
+  color,
 }) => {
   const cesium = useCesium();
   const [positionProperty, setPositionProperty] =
@@ -89,6 +65,12 @@ color: Color}> = ({
     pathPositionCol.length * 20,
     new JulianDate()
   );
+  const positionCol: Cartesian3[] = [];
+  for (let i = 0; i < pathPositionCol.length; i += 2) {
+    positionCol.push(
+      Cartesian3.fromDegrees(pathPositionCol[i], pathPositionCol[i + 1], 100)
+    );
+  }
   useEffect(() => {
     if (cesium.viewer) {
       cesium.viewer.clock.startTime = start.clone();
@@ -122,19 +104,32 @@ color: Color}> = ({
           ])
         }
         // orientation={new VelocityOrientationProperty(positionProperty)}
-        description={'hello'}
+        description={"hello"}
       >
-        <PathGraphics
-          show={true}
-          resolution={1}
-          material={
-            color
-          }
-          width={2}
-        />
+        <PathGraphics show={true} resolution={1} material={color} width={2} />
       </Entity>
     </>
   );
 };
 
-export default ViewUavVisual;
+const ViewUavVisualCol: React.FC<{}> = ({}) => {
+  const uavPlanPathPointCol = useRecoilValue(uavPlanPathPointColAtom);
+  return (
+    <>
+      {uavPlanPathPointCol.length > 0 ? (
+        uavPlanPathPointCol.map((item, index) => {
+          return (
+            <ViewUavVisual
+              pathPositionCol={item}
+              color={ColorCol[index]}
+            ></ViewUavVisual>
+          );
+        })
+      ) : (
+        <></>
+      )}
+    </>
+  );
+};
+
+export default ViewUavVisualCol;

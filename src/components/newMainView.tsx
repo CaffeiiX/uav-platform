@@ -11,7 +11,7 @@ import "./newMainView.css";
 import NewMapViewer from "./map/newMapViewer";
 import SiderContent from "./siderContent";
 import { useRecoilState, useRecoilValue} from "recoil";
-import { isControlSiderVisualAtom, isSiderShow, isSiderVisualAtom, isVisualItemAtom } from "../store/view";
+import { isControlSiderVisualAtom, isSiderShow, isSiderVisualAtom, isVisualItemAtom,isUavSiderVisualAtom } from "../store/view";
 import PureTask from "./pureTask/pureTask";
 import TaskModal from "./pureModal/taskModal";
 import { memo } from "react";
@@ -26,6 +26,8 @@ import WebsocketInfo from "./common/websocketInfo";
 import DynamicTaskModal from "./pureModal/dynamicTaskModal";
 import CreateTaskModal from "./pureModal/createTaskModal";
 import RelateTaskModal from "./pureModal/relateTaskModal";
+import FireSimulationSider from "./plugins/fire/fireSimulationSider";
+import UavSider from "./uavManagement/uavSider";
 const { SubMenu } = Menu;
 const {Content, Sider } = Layout;
 const MapViewer = memo(NewMapViewer);
@@ -35,6 +37,7 @@ const NewMainView: React.FC<{}> = () => {
   const [visible, setVisible] = useRecoilState(isSiderShow);
   const [visualVisible, setVisualVisible] = useRecoilState(isSiderVisualAtom);
   const [controlVisible, setControlVisible] = useRecoilState(isControlSiderVisualAtom);
+  const [uavManageVisible, setUavManageVisible] = useRecoilState(isUavSiderVisualAtom);
   const isVisualItem = useRecoilValue(isVisualItemAtom);
   const isShowPluginSider = useRecoilValue(isShowPluginSiderSelector);
   // const isShowDynamicTaskCreateModal = useRecoilValue(isShowDynamicTaskCreateModalSelector);
@@ -45,16 +48,25 @@ const NewMainView: React.FC<{}> = () => {
     setVisible(!visible);
     setVisualVisible(false);
     setControlVisible(false);
+    setUavManageVisible(false);
   };
   const showVisualSider = () => {
     setVisualVisible(!visualVisible);
     setVisible(false);
     setControlVisible(false);
+    setUavManageVisible(false);
   }
   const showControlSider = ()=>{
     setControlVisible(!controlVisible);
     setVisible(false);
     setVisualVisible(false);
+    setUavManageVisible(false);
+  }
+  const showUavManaSider = ()=>{
+    setUavManageVisible(!uavManageVisible);
+    setVisible(false);
+    setVisualVisible(false);
+    setControlVisible(false);
   }
   return (
       <Layout style={{ minHeight: '100vh' }}>
@@ -68,6 +80,9 @@ const NewMainView: React.FC<{}> = () => {
             </Menu.Item>
             <Menu.Item key="2" icon={<ControlOutlined />} onClick={showControlSider}>
               插件信息
+            </Menu.Item>
+            <Menu.Item key="3" icon={<ControlOutlined />} onClick={showUavManaSider}>
+              无人机信息
             </Menu.Item>
             {
               isVisualItem ? (
@@ -85,7 +100,7 @@ const NewMainView: React.FC<{}> = () => {
         <VisualSider/>
           {/* <VisualChart isShowChart={visualVisible}></VisualChart> */}
         <ControlSider/>
-        
+        <UavSider/>
         <Layout className="site-layout">
           <Content style={{ margin: '0' }}>
             <MapViewer/>
@@ -94,6 +109,10 @@ const NewMainView: React.FC<{}> = () => {
         {/* <FireInfoSider/> */}
         {
           isShowPluginSider? <FireInfoSider/> : <></>
+        }
+        {/* <FireSimulationSider/> */}
+        {
+          isShowPluginSider? <FireSimulationSider/> : <></>
         }
         {
           isShowPluginSider? <PluginsSider/> : <></>

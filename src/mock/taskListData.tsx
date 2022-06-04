@@ -34,4 +34,27 @@ const dataSource = [
     }
 ]
 
-export {columns, dataSource};
+const fireColumns = [
+    {
+        'title': '任务名',
+        'dataIndex': 'taskName',
+        'key': 'taskName',
+        'className': 'table-task-col'
+    },
+    {
+        'title': '无人机Id',
+        'dataIndex': 'uavId',
+        'key': 'uavId',
+        'className': 'table-task-col'
+    },
+    {
+        'title': '火灾时间',
+        'dataIndex': 'fireTime',
+        'key': 'fireTime',
+        'className': 'table-task-col'
+    },
+
+
+]
+
+export { columns, dataSource,fireColumns };

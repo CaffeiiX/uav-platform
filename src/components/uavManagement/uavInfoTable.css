@@ -1,0 +1,48 @@
+/* .fixed-ant-table {
+    min-height: 200px !important;
+  } */
+/* :global(.uav-info .uav-info-table) {
+    min-height: 200px !important;
+} */
+
+/* :global{
+    .fixed-ant-table{
+        .ant-table{
+            min-height: 200px !important;
+        }
+    }
+} */
+
+/* .fee11Input {
+    :global {
+        .ant-input {
+            background-color: #ffffff !important;
+            font-size: .14rem;
+            color: #555555  !important;
+            user-select: none;
+        }
+    }
+} */
+
+/* .boxW,.normalB {
+    :global {
+        .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
+            padding: 8px 8px !important;
+        }
+        .ant-table-thead > tr > th {
+            background-color: rgb(192, 244, 248);
+        }
+        .ant-table-thead > tr > th:hover {
+            background-color: rgb(192, 244, 248);
+        }
+        .ant-table-thead > tr > th.ant-table-column-has-actions.ant-table-column-has-sorters:hover {
+            background: rgb(192, 244, 248);
+        }
+    }
+} */
+
+
+:global(.fixed-ant-table .ant-table.ant-table-small) {
+    min-height: 200px !important;
+}
+

@@ -6,9 +6,12 @@ import {
   TaskInfoType,
   UavInfoType,
   UavListInTaskType,
+  FireTaskInfoType
 } from "../interface/taskType";
 import { findDroneInPolygonVoroni, polygonToWKTString } from "../utils/utils";
 import qs from "qs";
+
+
 const baseUrl = "http://192.168.61.91:30094/web/";
 const getTaskInfo = async (
   num: number,
@@ -56,6 +59,35 @@ const getTaskInfo = async (
   }
   return taskInfoList;
 };
+const getFireTaskInfo = async (Id:string,Name:string)=>{
+  // const selectTask=useRecoilValue(selectTaskAtom);
+  // const Id=selectTask.Id;
+  // const Name=selectTask.name;
+  const response = await axios.get(`${baseUrl}/queryFireRegion`,{
+      params:{
+          taskId:Id
+      }
+  })
+  // const taskData: FireTaskInfoType[] = response.data['data'];
+  console.log(response);
+  const taskInfoList: FireTaskInfoType[]=[];
+  const data=response.data.data;
+  for(let i=0;i<data.length;i++){
+      let task: FireTaskInfoType={
+          Id: Id,
+          taskName: Name,
+          uavId: data[i].droneId,
+          fireLocalTime: data[i].fireTime,
+          fireTime: data[i].fireTime,
+          currFire: data[i].fireExtent,
+          nextFire: data[i].firePredict,
+          fireEntiId: Math.random().toString()
+      }        
+      taskInfoList.push(task)
+  }
+  console.log("请求完成")
+  return taskInfoList;
+}
 const getTaskUavInfo = async (taskId: string) => {
   const response = await axios.get(`${baseUrl}/queryStatusOfDrone`, {
     params: {
@@ -134,7 +166,7 @@ const PostNormalPathAPI = async (
     voronoiLines: voronoiPolygonRegionList,
   };
   const response = await axios.post(
-    `http://192.168.31.218:8080/find/multiple`,
+    `${baseUrl}/find/multiple`,
     postData,
     {
       headers: {
@@ -210,5 +242,6 @@ export {
   PostFinishTaskAPI,
   PostNormalPathAPI,
   PostAddUavToTaskAPI,
-  getInUseUavListAPI
+  getInUseUavListAPI,
+  getFireTaskInfo
 };

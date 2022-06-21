@@ -1,16 +1,13 @@
-import { Button } from "antd";
+
 import {
   ClockRange,
   JulianDate,
   SampledPositionProperty,
-  Math as CMath,
   Cartesian3,
   Color,
-  PolylineGlowMaterialProperty,
   TimeIntervalCollection,
   TimeInterval,
 } from "cesium";
-import Viewer from "cesium/Source/Widgets/Viewer/Viewer";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { Entity, useCesium, PathGraphics, PointGraphics } from "resium";
@@ -25,10 +22,7 @@ const ColorCol = [
 function computePathFlight(
   start: JulianDate,
   pathPositionCol: number[],
-  viewer: Viewer,
-  color: Color
 ) {
-  console.log(pathPositionCol);
   const property = new SampledPositionProperty();
   for (let i = 0; i < pathPositionCol.length; i += 2) {
     const time = JulianDate.addSeconds(start, i * 20, new JulianDate());
@@ -38,16 +32,17 @@ function computePathFlight(
       100
     );
     property.addSample(time, position);
-    viewer.entities.add({
-      position: position,
-      point: {
-        pixelSize: 8,
-        color: color,
-        // color: Color.TRANSPARENT,
-        // outlineColor: color,
-        // outlineWidth: 3,
-      },
-    });
+    // pathPositionColCartesian3.push(position);
+    // viewer.entities.add({
+    //   position: position,
+    //   point: {
+    //     pixelSize: 8,
+    //     color: color,
+    //     // color: Color.TRANSPARENsT,
+    //     // outlineColor: color,
+    //     // outlineWidth: 3,
+    //   },
+    // });
   }
   return property;
 }
@@ -80,7 +75,7 @@ const ViewUavVisual: React.FC<{ pathPositionCol: number[]; color: Color }> = ({
       cesium.viewer.clock.multiplier = 10;
       cesium.viewer.timeline.zoomTo(start, stop);
       setPositionProperty(
-        computePathFlight(start, pathPositionCol, cesium.viewer, color)
+        computePathFlight(start, pathPositionCol)
       );
     }
   }, []);
@@ -108,6 +103,16 @@ const ViewUavVisual: React.FC<{ pathPositionCol: number[]; color: Color }> = ({
       >
         <PathGraphics show={true} resolution={1} material={color} width={2} />
       </Entity>
+      {
+        positionCol.map((item, index) => {
+          return (<Entity position={item}>
+            <PointGraphics
+            color={color}
+            pixelSize={8}
+            />
+          </Entity>)
+        })
+      }
     </>
   );
 };

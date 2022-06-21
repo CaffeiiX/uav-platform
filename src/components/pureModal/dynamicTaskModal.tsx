@@ -19,7 +19,6 @@ const DynamicTaskModal: React.FC<{}> = () => {
   useEffect(() => {
     if(uavWebsocketJsonMessage){
       if (!uavList.includes(uavWebsocketJsonMessage.UAV_id) && taskStatus === 1 && !isStopReceiveMessage){
-        console.log('here')
         setIsShowDynamicTaskModal(true);
         setUavList([...uavList, uavWebsocketJsonMessage.UAV_id]);
         setIsStopReceiveMessage(true);

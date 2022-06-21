@@ -6,12 +6,17 @@ import {
   Viewer as CesiumViewer, defined,
   ConstantPositionProperty
 } from "cesium";
-import { useEffect} from "react";
-import { useSetRecoilState, useRecoilValue } from "recoil";
+import { useEffect } from "react";
+import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 // import Entity from "cesium/Source/DataSources/Entity";
 import { CesiumMovementEvent } from "resium";
-import { drawPolygonRegionAtom, isDrawPolygonAtom } from "../store/map";
+import { TaskInfoType } from "../interface/taskType";
+import { drawPolygonRegionAtom, isDrawPolygonAtom, entitiesPropertiesAtom } from "../store/map";
 import { isCreateTaskModalAtom, isModalShowAtom, isShowCreateTaskModalAtom } from "../store/modal";
+import { selectTaskAtom } from "../store/task";
+import { entitiesControlType } from "../types/Entity";
+import { Cartesian3ToDegrees, getUuid } from "../utils/utils";
+
 // import { ScreenSpaceEventHandler } from "resium";
 
 const createPointEntity = (viewer: CesiumViewer, worldPosition:
@@ -117,6 +122,9 @@ function CesiumViewMouseEvent(viewer: CesiumViewer,
   setIsDrawPolygon: (c: boolean) => void,
   setIsShowModal: (c: boolean) => void,
   setPolygonRegion: (c: Cartesian3[]) => void,
+  setPolygonBoundary: (c: TaskInfoType) => void,
+  entitiesProperties: entitiesControlType,
+  setEntitiesProperties: (c: entitiesControlType) => void
 ) {
   let activePolygonPoints: Cartesian3[] = [];
   let activePolygon: any = undefined;
@@ -165,11 +173,24 @@ function CesiumViewMouseEvent(viewer: CesiumViewer,
       activePolygonPoints.pop();
       createPolygonEntity(viewer, activePolygonPoints);
       console.log(activePolygonPoints);
-      viewer.entities.remove(floatingPoint);
-      viewer.entities.remove(activePolygon);
+      // viewer.entities.remove(floatingPoint);
+      // viewer.entities.remove(activePolygon);
+      // viewer.entities.removeAll();
+      setPolygonBoundary({
+        Id: getUuid(),
+        name: 'random',
+        status: "0",
+        date: '日期',
+        boundary: activePolygonPoints.map(item => Cartesian3ToDegrees(item))
+      });
+      setEntitiesProperties({
+        ...entitiesProperties,
+        entitiesProperties: entitiesProperties.entitiesProperties.map(item =>
+          item.key === 'taskBoundaryComponent' ? { ...item, 'visual': true } : item)
+      });
       setPolygonRegion(activePolygonPoints);
       floatingPoint = undefined;
-      activePolygon = undefined;
+      // activePolygon = undefined;
       activePolygonPoints = [];
       setIsDrawPolygon(false);
       setIsShowModal(true);
@@ -183,14 +204,16 @@ const useMousePolygon = (viewer: CesiumViewer | undefined, mouseHandler: any) =>
   const setPolygonRegion = useSetRecoilState(drawPolygonRegionAtom);
   const isCreateTaskModal = useRecoilValue(isCreateTaskModalAtom);
   const setIsShowCreateTaskModal = useSetRecoilState(isShowCreateTaskModalAtom);
+  const setSelectTask = useSetRecoilState(selectTaskAtom);
+  const [entitiesProperties, setEntitiesProperties] = useRecoilState(entitiesPropertiesAtom);
   useEffect(() => {
     if (isDrawPolygon && viewer) {
       viewer.entities.removeAll();
-      if(isCreateTaskModal){
-        const a = CesiumViewMouseEvent(viewer, mouseHandler, setIsDrawPolygon, setIsShowCreateTaskModal, setPolygonRegion);
+      if (isCreateTaskModal) {
+        const a = CesiumViewMouseEvent(viewer, mouseHandler, setIsDrawPolygon, setIsShowCreateTaskModal, setPolygonRegion, setSelectTask, entitiesProperties, setEntitiesProperties);
         a();
       } else {
-        const a = CesiumViewMouseEvent(viewer, mouseHandler, setIsDrawPolygon, setIsShowModal, setPolygonRegion);
+        const a = CesiumViewMouseEvent(viewer, mouseHandler, setIsDrawPolygon, setIsShowModal, setPolygonRegion, setSelectTask, entitiesProperties, setEntitiesProperties);
         a();
       }
     } else {

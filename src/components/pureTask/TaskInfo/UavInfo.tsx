@@ -1,6 +1,7 @@
 import { Input, Switch, Select } from "antd";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { entitiesPropertiesAtom } from "../../../store/map";
 import { selectTaskAtom } from "../../../store/task";
 import { selectUavIdAtom, uavInTimePathDictAtom, uavWebsocketJsonMessageSelector } from "../../../store/uav";
 const { Option } = Select;
@@ -13,10 +14,14 @@ const UavInfo: React.FC<{
   const [isOpenSwitch, setIsOpenSwitch] = useState<boolean>(false);
   const selectTask = useRecoilValue(selectTaskAtom);
   const setUavInTimePathDict = useSetRecoilState(uavInTimePathDictAtom);
+  const [entitiesProperties, setEntitiesProperties] = useRecoilState(
+    entitiesPropertiesAtom
+  );
   useEffect(() => {
     if(uavWebscoketMessageJson){
       if(selectUavListInTask.includes(uavWebscoketMessageJson.UAV_id) && selectTask.status === '进行中'){
         setIsOpenSwitch(true);
+
       }
     }
   },[uavWebscoketMessageJson]);
@@ -33,6 +38,22 @@ const UavInfo: React.FC<{
   useEffect(() => {
     setIsOpenSwitch(false);
   },[selectTask.Id]);
+  const onSelectUav = (e:string) => {
+    setSelectUavId(e);
+    if(isOpenSwitch){
+      setEntitiesProperties({
+        ...entitiesProperties,
+        clockIsCurrent: true,
+        entitiesProperties: entitiesProperties.entitiesProperties.map((item) =>
+        {
+          if(item.key === 'uavInTimePathComponent') return {...item, visual: true};
+          else if(item.key === 'fireBillboard' || item.key === 'fireAniEntityComponent') return {...item, visual: false};
+          else return item;
+        }
+        ),
+      });
+    }
+  }
   return (
     <>
       <div style={{ marginTop: "10px", marginBottom: "8px" }}>
@@ -46,9 +67,7 @@ const UavInfo: React.FC<{
         <Select
           className="task-info-select"
           defaultValue={selectUavId}
-          onChange={(e) => {
-            setSelectUavId(e);
-          }}
+          onChange={onSelectUav}
         >
           {selectUavListInTask.map((item) => {
             return (

@@ -8,7 +8,6 @@ import {
 import { Cartesian3, Color, ColorMaterialProperty } from "cesium";
 import { cameraLookAtAtom } from "../../store/map";
 const TaskBoundary: React.FC<{}> = () => {
-  const cesiumRef = useCesium();
   const selectTask = useRecoilValue(selectTaskAtom);
   const setCameraLookAt = useSetRecoilState(cameraLookAtAtom);
   const isDrawSelectTaskBoundary = useRecoilValue(

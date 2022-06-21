@@ -58,7 +58,6 @@ const UavInTimePath: React.FC<{isTrack: boolean}> = ({isTrack}) => {
           'position': [...uavInTimePathDict[selectUavId]['position'], position]
         }
       });
-      console.log(uavInTimePathDict);
       if(cesiumRef.cesiumWidget){
         cesiumRef.cesiumWidget.scene.postProcessStages.fxaa.enabled = true;
       }

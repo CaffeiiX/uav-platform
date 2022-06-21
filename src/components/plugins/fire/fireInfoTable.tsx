@@ -9,7 +9,7 @@ import './fireInfoTable.css'
 import {calculatePolygonArea,getSelectUavList} from '../../../utils/utils'
 import FireDetailTable from "./fireDetailTable";
 import { selectTaskAtom } from "../../../store/task";
-import { isFireBillBoardShowAtom } from "../../../store/map";
+import { entitiesPropertiesAtom, isFireBillBoardShowAtom } from "../../../store/map";
 
 const FireInoTable: React.FC<{}> = ({ children }) => {
     const dataDetail = useRecoilValue(selectTaskAtom);
@@ -17,7 +17,8 @@ const FireInoTable: React.FC<{}> = ({ children }) => {
     let taskListAble = useRecoilValueLoadable(queryCurrentFireTaskList);
     const [selectTask, setSelectTask] = useRecoilState(selectFireTaskAtom);
     const setForceUdpateTask = useSetRecoilState(forceUpdateFireTaskAtom);
-    const [billBoardVisible,setBillBoradVisible]=useRecoilState(isFireBillBoardShowAtom)
+    const [billBoardVisible,setBillBoradVisible]=useRecoilState(isFireBillBoardShowAtom);
+    const [entitiesProperties, setEntitiesProperties] = useRecoilState(entitiesPropertiesAtom);
     switch (taskListAble.state) {
         case 'hasValue':
             return (
@@ -29,7 +30,19 @@ const FireInoTable: React.FC<{}> = ({ children }) => {
                             return {
                                 onClick: event => { 
                                  },
-                                onDoubleClick: event => { setSelectTask(record); setBillBoradVisible(true);},
+                                onDoubleClick: event => { 
+                                    setSelectTask(record); 
+                                    setBillBoradVisible(true);
+                                    setEntitiesProperties({
+                                        ...entitiesProperties,
+                                        entitiesProperties: entitiesProperties.entitiesProperties.map((item) =>
+                                        {
+                                            if(item.key === 'fireAniEntityComponent' || item.key === 'fireBillboard') return {...item, visual: true};
+                                            else if(item.key === 'uavInTimePathComponent') return {...item, visual: false};
+                                            else return item;
+                                        }
+                                        ),
+                                      });},
                                 onMouseEnter: event => { event.stopPropagation() }
                             }
                         }}

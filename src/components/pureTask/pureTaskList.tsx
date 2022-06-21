@@ -1,6 +1,7 @@
 import { Table } from "antd";
 import { useRecoilState, useRecoilValueLoadable, useSetRecoilState } from "recoil";
 import { columns} from "../../mock/taskListData";
+import { entitiesPropertiesAtom } from "../../store/map";
 import { forceUpdateTaskAtom, queryCurrentTaskList, selectTaskAtom, taskPageNumAtom} from "../../store/task";
 import { selectUavIdAtom} from "../../store/uav";
 // import { uavInTimePathDictAtom } from "../../store/uav";
@@ -12,7 +13,7 @@ const PureTaskList : React.FC<{}> = ({}) => {
     const [selectTask, setSelectTask] = useRecoilState(selectTaskAtom);
     const setSelectUavId = useSetRecoilState(selectUavIdAtom)
     const setForceUdpateTask = useSetRecoilState(forceUpdateTaskAtom);
-
+    const [entitiesProperties, setEntitiesProperties] = useRecoilState(entitiesPropertiesAtom);
     switch(taskListAble.state){
         case 'hasValue':
             return (
@@ -22,7 +23,15 @@ const PureTaskList : React.FC<{}> = ({}) => {
                        onRow={record => {
                            return {
                                onClick: event => {},
-                               onDoubleClick: event => {setSelectTask(record); setSelectUavId('')},
+                               onDoubleClick: event => {
+                                   setSelectTask(record); 
+                                   setSelectUavId('');
+                                   setEntitiesProperties({
+                                       ...entitiesProperties,
+                                       entitiesProperties: entitiesProperties.entitiesProperties.map(item=>
+                                        item.key === 'taskBoundaryComponent' ? {...item, 'visual': true} : item)
+                                   })
+                               },
                                onMouseEnter: event => {event.stopPropagation()}
                            }
                        }}

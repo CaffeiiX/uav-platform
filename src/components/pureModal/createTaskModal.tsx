@@ -13,10 +13,11 @@ const CreateTaskModal: React.FC<{}> = () => {
   const setIsDrawPolygon = useSetRecoilState(isDrawPolygonAtom);
   const setIsCreateTaskModal = useSetRecoilState(isCreateTaskModalAtom);
   const [uavList,setUavList] = useRecoilState(inUseUavListAtom);
-  const polygonRegion = useRecoilValue(drawPolygonRegionAtom);
+  const [polygonRegion, setPolygonRegion] = useRecoilState(drawPolygonRegionAtom);
   const taskStatus = useRecoilValue(taskStatusAtom);
   const setForceUpdateTask = useSetRecoilState(forceUpdateTaskAtom);
   const setIsStopReceiveMessage = useSetRecoilState(isStopReceiveMessageAtom);
+  
   const onButtonOk = async () => {
     setIsModalShow(false);
     setIsCreateTaskModal(false);
@@ -36,11 +37,16 @@ const CreateTaskModal: React.FC<{}> = () => {
     setIsStopReceiveMessage(false);
     return;
   }
+  const clearCreateTask = () => {
+    setTaskName('');
+    setPolygonRegion([]);
+  }
   const onCancelOk = () => {
     setUavList([...uavList.slice(0, uavList.length - 1)]);
     setIsModalShow(false);
     setIsCreateTaskModal(false);
     setIsStopReceiveMessage(false);
+    clearCreateTask();
     return;
   }
   return (
